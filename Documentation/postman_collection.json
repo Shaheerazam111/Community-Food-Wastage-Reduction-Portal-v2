@@ -1,0 +1,437 @@
+{
+	"info": {
+		"_postman_id": "c7f3a2a0-4f1e-4b1a-9e2d-cfwrp2v2000001",
+		"name": "Community Food Wastage Reduction Portal v2",
+		"description": "Minimal API for the v2 core engine assignment: signup/login, posting food, nearby search, and safe claiming. Run folders in order (1 -> 4). Requests reuse Postman's automatic cookie jar for session auth, so logging in as a different persona switches which user later requests act as.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "base_url", "value": "http://127.0.0.1:8000" },
+		{ "key": "listing_id", "value": "" },
+		{ "key": "donor_email", "value": "donor1@test.com" },
+		{ "key": "recipientA_email", "value": "ngoA@test.com" },
+		{ "key": "recipientB_email", "value": "ngoB@test.com" },
+		{ "key": "password", "value": "secret123" }
+	],
+	"item": [
+		{
+			"name": "1. Auth",
+			"item": [
+				{
+					"name": "Register Donor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Donor registered (201)', function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Pizza Palace\",\n  \"email\": \"{{donor_email}}\",\n  \"password\": \"{{password}}\",\n  \"role\": \"donor\",\n  \"business_name\": \"Pizza Palace\",\n  \"phone\": \"03001234567\",\n  \"address\": \"Main St, Karachi\",\n  \"latitude\": 24.8607,\n  \"longitude\": 67.0011\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": [ "{{base_url}}" ], "path": [ "auth", "register" ] }
+					}
+				},
+				{
+					"name": "Register Recipient A",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Recipient A registered (201)', function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Hope NGO\",\n  \"email\": \"{{recipientA_email}}\",\n  \"password\": \"{{password}}\",\n  \"role\": \"recipient\",\n  \"ngo_name\": \"Hope NGO\",\n  \"contact_person\": \"Ali Khan\",\n  \"address\": \"Near St, Karachi\",\n  \"latitude\": 24.8615,\n  \"longitude\": 67.0020\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": [ "{{base_url}}" ], "path": [ "auth", "register" ] }
+					}
+				},
+				{
+					"name": "Register Recipient B",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Recipient B registered (201)', function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Care NGO\",\n  \"email\": \"{{recipientB_email}}\",\n  \"password\": \"{{password}}\",\n  \"role\": \"recipient\",\n  \"ngo_name\": \"Care NGO\",\n  \"contact_person\": \"Sara Ahmed\",\n  \"address\": \"Far St, Karachi\",\n  \"latitude\": 24.9000,\n  \"longitude\": 67.0500\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/register", "host": [ "{{base_url}}" ], "path": [ "auth", "register" ] }
+					}
+				},
+				{
+					"name": "Login as Donor",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Logged in (200)', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{donor_email}}\",\n  \"password\": \"{{password}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": [ "{{base_url}}" ], "path": [ "auth", "login" ] }
+					},
+					"description": "Run this before any 'Donor' request in folder 2, so the session cookie belongs to the donor."
+				},
+				{
+					"name": "Login as Recipient A",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Logged in (200)', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{recipientA_email}}\",\n  \"password\": \"{{password}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": [ "{{base_url}}" ], "path": [ "auth", "login" ] }
+					},
+					"description": "Run this before 'Claim Listing (Recipient A - should succeed)'."
+				},
+				{
+					"name": "Login as Recipient B",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Logged in (200)', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{recipientB_email}}\",\n  \"password\": \"{{password}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": [ "{{base_url}}" ], "path": [ "auth", "login" ] }
+					},
+					"description": "Run this before 'Claim Listing Again (Recipient B - should FAIL with 409)'."
+				},
+				{
+					"name": "Login with Wrong Password (should fail)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Rejected (401)', function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{donor_email}}\",\n  \"password\": \"totally-wrong-password\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": [ "{{base_url}}" ], "path": [ "auth", "login" ] }
+					}
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": { "raw": "{{base_url}}/auth/logout", "host": [ "{{base_url}}" ], "path": [ "auth", "logout" ] }
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Food Listings (Donor)",
+			"item": [
+				{
+					"name": "Create Listing",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const inOneHour = new Date(Date.now() + 60 * 60 * 1000);",
+									"pm.collectionVariables.set('expiry_in_1h', inOneHour.toISOString().slice(0, 19).replace('T', ' '));"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Listing created (201)', function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"const body = pm.response.json();",
+									"if (body.listing && body.listing.id) {",
+									"    pm.collectionVariables.set('listing_id', body.listing.id);",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Leftover Pizzas\",\n  \"category\": \"veg\",\n  \"quantity\": \"10 servings\",\n  \"pickup_address\": \"Main St, Karachi\",\n  \"latitude\": 24.8607,\n  \"longitude\": 67.0011,\n  \"expiry_at\": \"{{expiry_in_1h}}\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/food", "host": [ "{{base_url}}" ], "path": [ "food" ] }
+					},
+					"description": "Run 'Login as Donor' first. Saves the new listing's id into {{listing_id}} for later requests."
+				},
+				{
+					"name": "Create Listing - Missing Fields (should fail)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Rejected (422)', function () {",
+									"    pm.response.to.have.status(422);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Missing everything else\"\n}"
+						},
+						"url": { "raw": "{{base_url}}/food", "host": [ "{{base_url}}" ], "path": [ "food" ] }
+					}
+				},
+				{
+					"name": "My Listings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": { "raw": "{{base_url}}/food/mine", "host": [ "{{base_url}}" ], "path": [ "food", "mine" ] }
+					},
+					"description": "Run 'Login as Donor' first."
+				},
+				{
+					"name": "Deliver Listing (before it is claimed - should fail)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Rejected (422) - not CLAIMED yet', function () {",
+									"    pm.response.to.have.status(422);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": { "raw": "{{base_url}}/food/{{listing_id}}/deliver", "host": [ "{{base_url}}" ], "path": [ "food", "{{listing_id}}", "deliver" ] }
+					},
+					"description": "Run this right after 'Create Listing', before anyone has claimed it. Proves the AVAILABLE -> DELIVERED shortcut is blocked."
+				},
+				{
+					"name": "Deliver Listing (after claim - should succeed)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Delivered (200)', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": { "raw": "{{base_url}}/food/{{listing_id}}/deliver", "host": [ "{{base_url}}" ], "path": [ "food", "{{listing_id}}", "deliver" ] }
+					},
+					"description": "Run 'Login as Donor' first, and only after folder 4's first claim has succeeded."
+				}
+			]
+		},
+		{
+			"name": "3. Nearby Search (Public)",
+			"item": [
+				{
+					"name": "Search Nearby - in range (should list the item)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('200 OK', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"pm.test('Listing appears, sorted by distance', function () {",
+									"    const body = pm.response.json();",
+									"    pm.expect(body.listings.length).to.be.above(0);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/food/search?latitude=24.8615&longitude=67.0020&radius_km=5",
+							"host": [ "{{base_url}}" ],
+							"path": [ "food", "search" ],
+							"query": [
+								{ "key": "latitude", "value": "24.8615" },
+								{ "key": "longitude", "value": "67.0020" },
+								{ "key": "radius_km", "value": "5" }
+							]
+						}
+					},
+					"description": "No login needed. Uses a point ~0.1km from the listing's pickup address."
+				},
+				{
+					"name": "Search Nearby - out of range (should be empty)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('200 OK, empty list', function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.json().listings.length).to.eql(0);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/food/search?latitude=25.5000&longitude=68.5000&radius_km=1",
+							"host": [ "{{base_url}}" ],
+							"path": [ "food", "search" ],
+							"query": [
+								{ "key": "latitude", "value": "25.5000" },
+								{ "key": "longitude", "value": "68.5000" },
+								{ "key": "radius_km", "value": "1" }
+							]
+						}
+					},
+					"description": "A point ~100km away with only a 1km radius - proves the radius filter works."
+				}
+			]
+		},
+		{
+			"name": "4. Claiming (Recipient)",
+			"item": [
+				{
+					"name": "Claim Listing (Recipient A - should succeed)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Claim successful (200)', function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": { "raw": "{{base_url}}/food/{{listing_id}}/claim", "host": [ "{{base_url}}" ], "path": [ "food", "{{listing_id}}", "claim" ] }
+					},
+					"description": "Run 'Login as Recipient A' first."
+				},
+				{
+					"name": "Claim Listing Again (Recipient B - should FAIL with 409)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Blocked - already claimed (409)', function () {",
+									"    pm.response.to.have.status(409);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": { "raw": "{{base_url}}/food/{{listing_id}}/claim", "host": [ "{{base_url}}" ], "path": [ "food", "{{listing_id}}", "claim" ] }
+					},
+					"description": "Run 'Login as Recipient B' first, then this, right after Recipient A's claim above. This is Postman's sequential proof that double-claiming is blocked. True same-millisecond concurrency was additionally verified with a scripted test outside Postman - see flow-test.md."
+				}
+			]
+		}
+	]
+}
