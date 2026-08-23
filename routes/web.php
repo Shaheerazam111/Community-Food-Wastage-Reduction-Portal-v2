@@ -1,13 +1,16 @@
 <?php
 
+use App\Http\Controllers\ApiTestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\FoodListingController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return response()->json(['message' => 'Community Food Wastage Reduction Portal API v2']);
-});
+Route::redirect('/', '/test-apis');
+
+Route::get('/test-apis', [ApiTestController::class, 'index']);
+Route::get('/test-apis/snapshot', [ApiTestController::class, 'snapshot']);
+Route::get('/test-apis/reverse-geocode', [ApiTestController::class, 'reverseGeocode']);
 
 // TASK 1: signup & login (session based)
 Route::post('/auth/register', [AuthController::class, 'register']);
