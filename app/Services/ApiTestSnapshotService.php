@@ -11,7 +11,9 @@ class ApiTestSnapshotService
     public function build(): array
     {
         return [
-            'session_user' => Auth::user()?->only(['id', 'name', 'email', 'role']),
+            'session_user' => Auth::user()?->only([
+                'id', 'name', 'email', 'role', 'address', 'business_name', 'latitude', 'longitude',
+            ]),
             'users' => $this->users(),
             'listings' => $this->listings(),
         ];
@@ -20,7 +22,7 @@ class ApiTestSnapshotService
     private function users()
     {
         return User::query()
-            ->select('id', 'name', 'email', 'role', 'business_name', 'ngo_name', 'latitude', 'longitude', 'created_at')
+            ->select('id', 'name', 'email', 'role', 'business_name', 'ngo_name', 'address', 'latitude', 'longitude', 'created_at')
             ->orderBy('id')
             ->get();
     }

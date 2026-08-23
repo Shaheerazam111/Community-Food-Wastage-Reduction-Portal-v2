@@ -124,6 +124,8 @@
         .session-role-badge.recipient { background: #713f12; color: #fbbf24; }
         .session-widget-actions { margin-top: .5rem; display: flex; gap: .35rem; flex-wrap: wrap; }
         .session-widget-actions .btn { padding: .25rem .55rem; font-size: .72rem; }
+        .donor-location-box { grid-column: 1 / -1; background: var(--bg); border: 1px solid #166534; border-radius: 6px; padding: .65rem .75rem; font-size: .85rem; color: #86efac; }
+        .donor-location-box.warn { border-color: #854d0e; color: #fcd34d; }
         @media (max-width: 600px) {
             .session-widget { top: auto; bottom: 1rem; right: 1rem; left: 1rem; max-width: none; }
         }

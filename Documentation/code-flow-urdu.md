@@ -80,7 +80,7 @@ File: `routes/web.php`
 
 | Function | Kya Karti Hai |
 |----------|-------------|
-| `store()` | Donor naya food item post karta hai. Status = `AVAILABLE`. |
+| `store()` | Donor naya food item post karta hai. **Location donor profile se auto** (address, lat, lng). Sirf title, category, quantity, expiry form mein. |
 | `myListings()` | Logged-in donor ki apni listings dikhao. |
 | `search()` | **Task 3 + Challenge 1 & 3.** Lat/lng + radius se paas ki AVAILABLE listings. Distance SQL mein calculate. Expired hide. |
 | `markDelivered()` | Status `CLAIMED` se `DELIVERED`. Pehle claim hona zaroori. |

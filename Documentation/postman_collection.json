@@ -233,11 +233,11 @@
 						"header": [ { "key": "Content-Type", "value": "application/json" } ],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"title\": \"Leftover Pizzas\",\n  \"category\": \"veg\",\n  \"quantity\": \"10 servings\",\n  \"pickup_address\": \"Main St, Karachi\",\n  \"latitude\": 24.8607,\n  \"longitude\": 67.0011,\n  \"expiry_at\": \"{{expiry_in_1h}}\"\n}"
+							"raw": "{\n  \"title\": \"Leftover Pizzas\",\n  \"category\": \"veg\",\n  \"quantity\": \"10 servings\",\n  \"expiry_at\": \"{{expiry_in_1h}}\"\n}"
 						},
 						"url": { "raw": "{{base_url}}/food", "host": [ "{{base_url}}" ], "path": [ "food" ] }
 					},
-					"description": "Run 'Login as Donor' first. Saves the new listing's id into {{listing_id}} for later requests."
+                    "description": "Run 'Login as Donor' first. Pickup location comes from the donor profile automatically. Saves the new listing's id into {{listing_id}} for later requests."
 				},
 				{
 					"name": "Create Listing - Missing Fields (should fail)",

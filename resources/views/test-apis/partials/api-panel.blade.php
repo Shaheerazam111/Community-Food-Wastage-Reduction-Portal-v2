@@ -51,6 +51,7 @@
                     </div>
                 @endforeach
 
+                @include('test-apis.partials.donor-location', ['api' => $api])
                 @include('test-apis.partials.map-blocks', ['api' => $api])
                 @include('test-apis.partials.listing-picker', ['api' => $api])
 

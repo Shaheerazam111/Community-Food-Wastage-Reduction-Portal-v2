@@ -5,6 +5,24 @@ import { refreshListingPickers } from './listings.js';
 import { drawOverviewFromSnapshot } from './overview-map.js';
 import { redrawSearchPreview } from './search-map.js';
 
+function updateDonorLocationHints(sessionUser) {
+    document.querySelectorAll('[id^="donor-location-"]').forEach((box) => {
+        if (!sessionUser || sessionUser.role !== 'donor') {
+            box.className = 'donor-location-box warn';
+            box.textContent = 'Login as a donor first — pickup location comes from the donor profile.';
+            return;
+        }
+        if (sessionUser.latitude == null || sessionUser.longitude == null) {
+            box.className = 'donor-location-box warn';
+            box.textContent = 'Your donor profile has no location. Register again with map location or use Register Donor.';
+            return;
+        }
+        const address = sessionUser.address || sessionUser.business_name || 'Donor address';
+        box.className = 'donor-location-box';
+        box.innerHTML = `<strong>Pickup location (auto from donor profile):</strong> ${address} · Lat ${sessionUser.latitude}, Lng ${sessionUser.longitude}`;
+    });
+}
+
 function renderUsersTable(users) {
     const tbody = document.querySelector('#users-table tbody');
     if (!users.length) {
@@ -49,6 +67,7 @@ export async function refreshSnapshot() {
 
     setSnapshot(data);
     updateSessionUI(data.session_user);
+    updateDonorLocationHints(data.session_user);
     renderUsersTable(data.users);
     renderListingsTable(data.listings);
     drawOverviewFromSnapshot(data);

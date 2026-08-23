@@ -21,13 +21,21 @@ class FoodListingController extends Controller
             'title' => 'required|string|max:255',
             'category' => ['required', Rule::in(['veg', 'non_veg'])],
             'quantity' => 'required|string|max:100',
-            'pickup_address' => 'required|string|max:255',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
             'expiry_at' => 'required|date|after:now',
         ]);
 
-        $data['donor_id'] = Auth::id();
+        $donor = Auth::user();
+
+        if ($donor->latitude === null || $donor->longitude === null) {
+            return response()->json([
+                'message' => 'Donor profile must have latitude and longitude (set during registration).',
+            ], 422);
+        }
+
+        $data['donor_id'] = $donor->id;
+        $data['pickup_address'] = $donor->address ?? $donor->business_name ?? 'Donor location';
+        $data['latitude'] = $donor->latitude;
+        $data['longitude'] = $donor->longitude;
 
         $listing = FoodListing::create($data);
 
