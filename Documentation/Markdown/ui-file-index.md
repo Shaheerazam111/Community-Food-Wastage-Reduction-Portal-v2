@@ -65,7 +65,10 @@ Recipient dashboard, find food, my claims.
 | `resources/views/recipient/food/index.blade.php` | GPS / profile / city search + map pins + results table | `/recipient/food`, GET `/food/search` |
 | `resources/views/recipient/food/show.blade.php` | Listing detail, map, claim | `/recipient/food/{id}` |
 | `resources/views/partials/search_results_map.blade.php` | Leaflet pins for search results | (included on find food) |
-| `resources/views/recipient/claims/index.blade.php` | Claim cards: pickup map, donor phone, mark delivered | `/food/claims`, POST `/food/{id}/deliver` |
+| `resources/views/recipient/claims/index.blade.php` | Claim cards: pickup map, donor phone, mark delivered, rate delivered | `/food/claims`, POST `/food/{id}/deliver`, POST `/food/{id}/feedback` |
+| `resources/views/partials/listing_feedback_form.blade.php` | 1–5 rating + comment after DELIVERED | (included on My claims) |
+| `app/Http/Controllers/FeedbackController.php` | Save one feedback per listing | POST `/food/{id}/feedback` |
+| `app/Models/Feedback.php` | `feedback` table | — |
 | `resources/views/partials/recipient_nav.blade.php` | Recipient navbar links incl. My profile | (included on recipient pages) |
 | `resources/views/profile/show.blade.php` | Update profile + verification document upload | `/profile`, POST `/profile`, POST `/profile/document` |
 
@@ -100,7 +103,13 @@ Admin dashboard, users (view doc), moderate listings (reject reason), disputes, 
 
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
-| `resources/views/admin/dashboard.blade.php` | User/listing counts; pending verification count | `/admin/dashboard` (auth, admin) |
+| `resources/views/admin/dashboard.blade.php` | Users, listing status counts, pending verification, recent feedback | `/admin/dashboard` |
+| `resources/views/admin/reports/index.blade.php` | Portal totals + city impact table (meals/kg) | `/admin/reports` |
+| `resources/views/admin/listings/index.blade.php` | Read-only all listings; filter status/city | `/admin/listings` |
+| `app/Support/ListingImpact.php` | Meals/kg saved queries for dashboards & reports | — |
+| `app/Http/Controllers/AdminReportController.php` | Reports + admin listing browser | `/admin/reports`, `/admin/listings` |
+| `resources/views/admin/categories/index.blade.php` | List/add/activate food categories | `/admin/categories`, POST routes |
+| `app/Http/Controllers/AdminFoodCategoryController.php` | Category admin (no delete) | `/admin/categories` |
 | `resources/views/admin/users/index.blade.php` | Approve, reject, block donor/NGO users; view document | `/admin/users`, POST `/admin/users/{id}`, GET `.../document` |
 | `portal/resources/views/admin/users/index.blade.php` | User list; View document modal stub; Approve / Block | `/admin/users`, POST `/admin/users/{id}` |
 | `portal/resources/views/admin/donations/index.blade.php` | Moderate listings + reject reason; recent feedback list | `/admin/donations`, POST `/admin/donations/{id}` |

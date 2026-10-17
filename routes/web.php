@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\AdminFoodCategoryController;
+use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\ApiTestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClaimController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\FoodListingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationController;
@@ -58,6 +61,7 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         Route::middleware('verified.account')->group(function () {
             Route::post('/food/{id}/claim', [ClaimController::class, 'claim']);
+            Route::post('/food/{id}/feedback', [FeedbackController::class, 'store']);
         });
     });
 
@@ -67,6 +71,11 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/dashboard', [PortalController::class, 'adminDashboard']);
+        Route::get('/admin/reports', [AdminReportController::class, 'reports']);
+        Route::get('/admin/listings', [AdminReportController::class, 'listings']);
+        Route::get('/admin/categories', [AdminFoodCategoryController::class, 'index']);
+        Route::post('/admin/categories', [AdminFoodCategoryController::class, 'store']);
+        Route::post('/admin/categories/{category}', [AdminFoodCategoryController::class, 'update']);
         Route::get('/admin/users', [AdminUserController::class, 'index']);
         Route::post('/admin/users/{user}', [AdminUserController::class, 'update']);
         Route::get('/admin/users/{user}/document', [AdminUserController::class, 'document']);

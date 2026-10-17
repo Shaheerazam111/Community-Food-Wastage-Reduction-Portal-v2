@@ -483,6 +483,32 @@ body {
     }
 }
 
+.claim-card-foot-stack {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.claim-feedback-panel {
+    width: 100%;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.375rem;
+    padding: 1rem;
+}
+
+.feedback-stars {
+    color: #cbd5e1;
+    letter-spacing: 0.05em;
+}
+
+.feedback-star.is-on {
+    color: #d97706;
+}
+
+.feedback-form {
+    max-width: 28rem;
+}
+
 /* Dispute cards */
 .dispute-card {
     border: 1px solid rgba(0, 0, 0, 0.08);

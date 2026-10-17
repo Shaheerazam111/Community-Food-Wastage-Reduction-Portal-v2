@@ -135,11 +135,14 @@
                             </button>
                         </form>
                     </div>
-                @elseif ($claim->status === 'DELIVERED' && $claim->delivered_at)
-                    <div class="claim-card-foot claim-card-foot-muted">
-                        <span class="small text-muted">
-                            Delivered {{ $claim->delivered_at->format('M j, Y · g:i A') }}
-                        </span>
+                @elseif ($claim->status === 'DELIVERED')
+                    <div class="claim-card-foot claim-card-foot-stack">
+                        @if ($claim->delivered_at)
+                            <span class="small text-muted d-block mb-3">
+                                Delivered {{ $claim->delivered_at->format('M j, Y · g:i A') }}
+                            </span>
+                        @endif
+                        @include('partials.listing_feedback_form', ['claim' => $claim])
                     </div>
                 @endif
             </article>

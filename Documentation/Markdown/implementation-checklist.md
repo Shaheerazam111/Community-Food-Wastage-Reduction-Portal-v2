@@ -53,7 +53,7 @@ These come from `Documentation/rules/` plus the project brief. Do not skip them 
 
 ## 1. Where we are now
 
-**Completed checklist steps:** Steps 1–6. **Next:** Step 7 (feedback and rating).
+**Completed checklist steps:** Steps 1–9. **Next:** Step 10 (polish).
 
 ### Already working (do not rebuild)
 
@@ -73,10 +73,7 @@ These come from `Documentation/rules/` plus the project brief. Do not skip them 
 
 | Requirement                            | Step         |
 | -------------------------------------- | ------------ |
-| Feedback & rating                      | **7** (next) |
-| Impact metrics & admin reports         | 8            |
-| Admin manage categories (CRUD UI)      | 9            |
-| Polish, install doc, home copy         | 10           |
+| Polish, install doc, home copy         | **10** (next) |
 
 
 ### Docs / cleanup (later)
@@ -230,10 +227,10 @@ Keep this small: a `notifications` table + a bell on the navbar. No queues, no e
 
 Official: *recipients rate quality and hygiene after receiving food.*
 
-- [ ] **7.1** Table `feedback` (`food_listing_id` unique, `recipient_id`, `rating` 1–5, `comment`, timestamps).
-- [ ] **7.2** After `DELIVERED`, the recipient sees a short form: star/number rating + optional comment.
-- [ ] **7.3** One feedback per listing. Cannot submit twice.
-- [ ] **7.4** Donor dashboard shows average rating (simple). Admin can see recent feedback on reports or users — a short list is enough.
+- [x] **7.1** Table `feedback` (`food_listing_id` unique, `recipient_id`, `rating` 1–5, `comment`, timestamps).
+- [x] **7.2** After `DELIVERED`, the recipient sees a short form: star/number rating + optional comment.
+- [x] **7.3** One feedback per listing. Cannot submit twice.
+- [x] **7.4** Donor dashboard shows average rating (simple). Admin can see recent feedback on reports or users — a short list is enough.
 
 **Done when:** NGO marks delivered, rates 1–5, donor sees that rating.
 
@@ -245,14 +242,14 @@ Official outputs: donor impact, recipient nearby list, admin city-wise trends, w
 
 Keep numbers honest and simple.
 
-- [ ] **8.1** **Donor dashboard:** active listings, delivered count, **meals saved** = sum of `quantity_value` where unit is `servings` and status is `DELIVERED`. Also show **kg saved** for kg listings. Recent listings table stays.
-- [ ] **8.2** **Recipient dashboard:** nearby available food (prioritized by distance), claim history link, unread notification note.
-- [ ] **8.3** **Admin dashboard:** counts of users, available/claimed/delivered listings, unverified users waiting.
-- [ ] **8.4** **Admin reports** page:
+- [x] **8.1** **Donor dashboard:** active listings, delivered count, **meals saved** = sum of `quantity_value` where unit is `servings` and status is `DELIVERED`. Also show **kg saved** for kg listings. Recent listings table stays.
+- [x] **8.2** **Recipient dashboard:** nearby available food (prioritized by distance), claim history link, unread notification note.
+- [x] **8.3** **Admin dashboard:** counts of users, available/claimed/delivered listings, unverified users waiting.
+- [x] **8.4** **Admin reports** page:
   - totals: listings, delivered, kg saved, meals saved
   - table: city | listings | delivered | meals/kg
   - no Chart.js unless a plain Bootstrap table looks empty — prefer a table first
-- [ ] **8.5** Admin can open a read-only list of all donations (filter by status/city). No extra “moderate listing” workflow.
+- [x] **8.5** Admin can open a read-only list of all donations (filter by status/city). No extra “moderate listing” workflow.
 
 **Done when:** each role’s home page shows the numbers from the database, not dummy data.
 
@@ -262,9 +259,9 @@ Keep numbers honest and simple.
 
 Official: *admin manages food categories.*
 
-- [ ] **9.1** Admin **Categories** page: list, add name, activate/deactivate.
-- [ ] **9.2** Do not delete Veg / Non-veg if listings already use them; only deactivate.
-- [ ] **9.3** Post-food dropdown shows active categories only.
+- [x] **9.1** Admin **Categories** page: list, add name, activate/deactivate.
+- [x] **9.2** Do not delete Veg / Non-veg if listings already use them; only deactivate.
+- [x] **9.3** Post-food dropdown shows active categories only.
 
 **Done when:** admin adds e.g. “Packaged”, and it appears on the donor form.
 

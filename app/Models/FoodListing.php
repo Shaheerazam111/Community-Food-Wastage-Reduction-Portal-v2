@@ -53,6 +53,11 @@ class FoodListing extends Model
         return $this->belongsTo(FoodCategory::class, 'category_id');
     }
 
+    public function feedback()
+    {
+        return $this->hasOne(Feedback::class, 'food_listing_id');
+    }
+
     protected function quantityDisplay(): Attribute
     {
         return Attribute::get(function () {

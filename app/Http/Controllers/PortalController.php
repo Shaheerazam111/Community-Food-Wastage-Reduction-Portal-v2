@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Feedback;
 use App\Models\FoodCategory;
 use App\Models\FoodListing;
+use App\Support\ListingImpact;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -35,6 +37,19 @@ class PortalController extends Controller
             'claimed' => FoodListing::where('donor_id', $donorId)->where('status', 'CLAIMED')->count(),
             'delivered' => FoodListing::where('donor_id', $donorId)->where('status', 'DELIVERED')->count(),
         ];
+
+        $ratingQuery = Feedback::whereHas('foodListing', function ($query) use ($donorId) {
+            $query->where('donor_id', $donorId);
+        });
+
+        $stats['rating_count'] = (int) $ratingQuery->count();
+        $stats['rating_avg'] = $stats['rating_count'] > 0
+            ? round((float) $ratingQuery->avg('rating'), 1)
+            : null;
+
+        $impact = ListingImpact::totals($donorId);
+        $stats['meals_saved'] = $impact['meals_saved'];
+        $stats['kg_saved'] = $impact['kg_saved'];
 
         return view('donor.dashboard', compact('listings', 'stats'));
     }
@@ -110,11 +125,22 @@ class PortalController extends Controller
             'donors' => \App\Models\User::where('role', 'donor')->count(),
             'recipients' => \App\Models\User::where('role', 'recipient')->count(),
             'listings' => FoodListing::count(),
+            'listings_available' => FoodListing::where('status', 'AVAILABLE')->count(),
+            'listings_claimed' => FoodListing::where('status', 'CLAIMED')->count(),
+            'listings_delivered' => FoodListing::where('status', 'DELIVERED')->count(),
             'pending_verification' => \App\Models\User::whereIn('role', ['donor', 'recipient'])
                 ->where('is_verified', false)
                 ->count(),
         ];
 
-        return view('admin.dashboard', compact('stats'));
+        $recentFeedback = Feedback::with([
+            'foodListing:id,title,donor_id',
+            'recipient:id,name,ngo_name',
+        ])
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'recentFeedback'));
     }
 }

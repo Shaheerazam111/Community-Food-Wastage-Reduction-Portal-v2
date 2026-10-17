@@ -221,7 +221,7 @@ class FoodListingController extends Controller
     public function myClaims(Request $request)
     {
         $listings = FoodListing::where('claimed_by', Auth::id())
-            ->with('donor:id,name,business_name,phone,address,latitude,longitude')
+            ->with(['donor:id,name,business_name,phone,address,latitude,longitude', 'feedback'])
             ->orderByDesc('claimed_at')
             ->get();
 

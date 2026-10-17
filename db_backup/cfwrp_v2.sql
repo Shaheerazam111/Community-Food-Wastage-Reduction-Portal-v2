@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 17, 2026 at 10:37 PM
+-- Generation Time: Oct 17, 2026 at 10:50 PM
 -- Server version: 10.11.14-MariaDB-0ubuntu0.24.04.1
 -- PHP Version: 8.3.6
 
@@ -40,6 +40,22 @@ CREATE TABLE `failed_jobs` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `feedback`
+--
+
+CREATE TABLE `feedback` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `food_listing_id` bigint(20) UNSIGNED NOT NULL,
+  `recipient_id` bigint(20) UNSIGNED NOT NULL,
+  `rating` tinyint(3) UNSIGNED NOT NULL,
+  `comment` varchar(500) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `food_categories`
 --
 
@@ -56,8 +72,8 @@ CREATE TABLE `food_categories` (
 --
 
 INSERT INTO `food_categories` (`id`, `name`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'Vegetarian', 1, '2026-10-17 17:01:16', '2026-10-17 17:01:16'),
-(2, 'Non-vegetarian', 1, '2026-10-17 17:01:16', '2026-10-17 17:01:16');
+(1, 'Vegetarian', 1, '2026-10-17 17:49:20', '2026-10-17 17:49:20'),
+(2, 'Non-vegetarian', 1, '2026-10-17 17:49:20', '2026-10-17 17:49:20');
 
 -- --------------------------------------------------------
 
@@ -92,15 +108,14 @@ CREATE TABLE `food_listings` (
 --
 
 INSERT INTO `food_listings` (`id`, `donor_id`, `title`, `category_id`, `description`, `quantity_value`, `quantity_unit`, `photo_path`, `pickup_address`, `city`, `latitude`, `longitude`, `expiry_at`, `status`, `claimed_by`, `claimed_at`, `delivered_at`, `created_at`, `updated_at`) VALUES
-(8, 25, '[Demo] 20 veg lunch boxes', 1, 'Fresh vegetarian lunch packs from today service.', 20.00, 'servings', NULL, '12 Food Street, Gulberg, Lahore', 'Lahore', 31.5120000, 74.3450000, '2026-10-18 08:20:41', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41'),
-(9, 25, '[Demo] 15 kg cooked rice', 1, 'Plain rice, kept warm. Bring containers.', 15.00, 'kg', NULL, '12 Food Street, Gulberg, Lahore', 'Lahore', 31.5095000, 74.3410000, '2026-10-18 04:20:41', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41'),
-(10, 25, '[Demo] 40 chicken biryani servings', 2, 'Non-veg biryani trays. Pickup before expiry.', 40.00, 'servings', NULL, 'Gulberg III, Lahore', 'Lahore', 31.5155000, 74.3520000, '2026-10-18 06:20:41', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41'),
-(11, 25, '[Demo] Cancelled listing (hidden)', 1, 'Should not appear in NGO search.', 5.00, 'servings', NULL, 'Gulberg, Lahore', 'Lahore', 31.5120000, 74.3450000, '2026-10-18 22:20:41', 'CANCELLED', NULL, NULL, NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41'),
-(12, 25, '[Demo] Already claimed (hidden)', 1, 'Claimed by Demo NGO — for claims history.', 25.00, 'servings', NULL, 'Model Town, Lahore', 'Lahore', 31.4810000, 74.3250000, '2026-10-18 10:20:41', 'CLAIMED', 26, '2026-10-17 20:20:41', NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41'),
-(13, 25, '[Demo] Delivered last week', 1, 'Finished pickup — donor stats only.', 10.00, 'kg', NULL, 'Gulberg, Lahore', 'Lahore', 31.5120000, 74.3450000, '2026-10-16 22:20:41', 'DELIVERED', 26, '2026-10-14 22:20:41', '2026-10-15 00:20:41', '2026-10-17 17:20:41', '2026-10-17 17:20:41'),
-(14, 27, '[Demo] Karachi fish curry 12 kg', 2, 'Karachi-only listing for city filter test.', 12.00, 'kg', NULL, 'Clifton, Karachi', 'Karachi', 24.8138000, 67.0299000, '2026-10-18 07:20:41', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41'),
-(15, 27, '[Demo] Karachi veg daal 30 servings', 1, 'Another Karachi listing.', 30.00, 'servings', NULL, 'DHA Phase 6, Karachi', 'Karachi', 24.8050000, 67.0750000, '2026-10-18 05:20:41', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41'),
-(16, 25, '2 Shawarma', 2, 'testing notifications', 2.00, 'servings', 'food-listings/25/1EXExRIhvVBbk4OV7kEzxXUofnNWTXCg50iXAocZ.png', '12 Food Street, Gulberg', 'Lahore', 31.5120000, 74.3450000, '2026-10-19 03:35:00', 'CLAIMED', 26, '2026-10-17 22:36:13', NULL, '2026-10-17 17:35:40', '2026-10-17 17:36:13');
+(20, 48, '[Demo] 20 veg lunch boxes', 1, 'Fresh vegetarian lunch packs from today service.', 20.00, 'servings', NULL, '12 Food Street, Gulberg, Lahore', 'Lahore', 31.5120000, 74.3450000, '2026-10-18 08:49:25', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25'),
+(21, 48, '[Demo] 15 kg cooked rice', 1, 'Plain rice, kept warm. Bring containers.', 15.00, 'kg', NULL, '12 Food Street, Gulberg, Lahore', 'Lahore', 31.5095000, 74.3410000, '2026-10-18 04:49:25', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25'),
+(22, 48, '[Demo] 40 chicken biryani servings', 2, 'Non-veg biryani trays. Pickup before expiry.', 40.00, 'servings', NULL, 'Gulberg III, Lahore', 'Lahore', 31.5155000, 74.3520000, '2026-10-18 06:49:25', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25'),
+(23, 48, '[Demo] Cancelled listing (hidden)', 1, 'Should not appear in NGO search.', 5.00, 'servings', NULL, 'Gulberg, Lahore', 'Lahore', 31.5120000, 74.3450000, '2026-10-18 22:49:25', 'CANCELLED', NULL, NULL, NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25'),
+(24, 48, '[Demo] Already claimed (hidden)', 1, 'Claimed by Demo NGO — for claims history.', 25.00, 'servings', NULL, 'Model Town, Lahore', 'Lahore', 31.4810000, 74.3250000, '2026-10-18 10:49:25', 'CLAIMED', 49, '2026-10-17 20:49:25', NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25'),
+(25, 48, '[Demo] Delivered last week', 1, 'Finished pickup — donor stats only.', 10.00, 'kg', NULL, 'Gulberg, Lahore', 'Lahore', 31.5120000, 74.3450000, '2026-10-16 22:49:25', 'DELIVERED', 49, '2026-10-14 22:49:25', '2026-10-15 00:49:25', '2026-10-17 17:49:25', '2026-10-17 17:49:25'),
+(26, 50, '[Demo] Karachi fish curry 12 kg', 2, 'Karachi-only listing for city filter test.', 12.00, 'kg', NULL, 'Clifton, Karachi', 'Karachi', 24.8138000, 67.0299000, '2026-10-18 07:49:25', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25'),
+(27, 50, '[Demo] Karachi veg daal 30 servings', 1, 'Another Karachi listing.', 30.00, 'servings', NULL, 'DHA Phase 6, Karachi', 'Karachi', 24.8050000, 67.0750000, '2026-10-18 05:49:25', 'AVAILABLE', NULL, NULL, NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25');
 
 -- --------------------------------------------------------
 
@@ -130,7 +145,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (9, '2026_10_18_000002_drop_food_table', 1),
 (10, '2026_10_18_100000_create_verification_documents_table', 1),
 (11, '2026_10_18_110000_step3_food_categories_and_listing_fields', 1),
-(12, '2026_10_18_120000_create_notifications_table', 1);
+(12, '2026_10_18_120000_create_notifications_table', 1),
+(13, '2026_10_18_130000_create_feedback_table', 1);
 
 -- --------------------------------------------------------
 
@@ -147,14 +163,6 @@ CREATE TABLE `notifications` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `notifications`
---
-
-INSERT INTO `notifications` (`id`, `user_id`, `food_listing_id`, `message`, `is_read`, `created_at`, `updated_at`) VALUES
-(13, 26, 16, 'New food in Lahore: 2 Shawarma.', 0, '2026-10-17 17:35:40', '2026-10-17 17:35:40'),
-(14, 25, 16, 'City Food Relief claimed 2 Shawarma.', 0, '2026-10-17 17:36:13', '2026-10-17 17:36:13');
 
 -- --------------------------------------------------------
 
@@ -220,11 +228,11 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `role`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`, `business_name`, `phone`, `ngo_name`, `contact_person`, `address`, `city`, `latitude`, `longitude`, `is_verified`, `is_active`) VALUES
-(24, 'Portal Admin', 'admin@food.test', 'admin', NULL, '$2y$10$pClo.2DOsb8rDPuvrDnvWOIhzG6vwum9OPLVvaN9qbrV9qSdmJJqi', NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41', NULL, '03000000001', NULL, NULL, 'Admin office, Mall Road', 'Lahore', 31.5204000, 74.3587000, 1, 1),
-(25, 'Demo Donor', 'donor@food.test', 'donor', NULL, '$2y$10$pClo.2DOsb8rDPuvrDnvWOIhzG6vwum9OPLVvaN9qbrV9qSdmJJqi', NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41', 'Green Kitchen Restaurant', '03000000002', NULL, NULL, '12 Food Street, Gulberg', 'Lahore', 31.5120000, 74.3450000, 1, 1),
-(26, 'Demo NGO', 'ngo@food.test', 'recipient', NULL, '$2y$10$pClo.2DOsb8rDPuvrDnvWOIhzG6vwum9OPLVvaN9qbrV9qSdmJJqi', NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41', NULL, '03000000003', 'City Food Relief', 'Sara Khan', '45 Hope Avenue, Model Town', 'Lahore', 31.4850000, 74.3200000, 1, 1),
-(27, 'Karachi Kitchen', 'donor.khi@food.test', 'donor', NULL, '$2y$10$RR21FUquJgncagoGfFcEaOJ5vMJf13Dr69V66Y/Plhd9qiVKDURqi', NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41', 'Harbor Kitchen Karachi', '03000000004', NULL, NULL, 'Clifton Block 5', 'Karachi', 24.8138000, 67.0299000, 1, 1),
-(28, 'Pending NGO', 'ngo.pending@food.test', 'recipient', NULL, '$2y$10$RR21FUquJgncagoGfFcEaOJ5vMJf13Dr69V66Y/Plhd9qiVKDURqi', NULL, '2026-10-17 17:20:41', '2026-10-17 17:20:41', NULL, '03000000005', 'Waiting Relief', 'Ali Raza', 'Johar Town', 'Lahore', 31.4697000, 74.2728000, 0, 1);
+(47, 'Portal Admin', 'admin@food.test', 'admin', NULL, '$2y$10$7i8LRaA3fwI3QZ0T1iKiSunhKKl..Fyp/g.KeFKlsVIDrrvINsrky', NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25', NULL, '03000000001', NULL, NULL, 'Admin office, Mall Road', 'Lahore', 31.5204000, 74.3587000, 1, 1),
+(48, 'Demo Donor', 'donor@food.test', 'donor', NULL, '$2y$10$7i8LRaA3fwI3QZ0T1iKiSunhKKl..Fyp/g.KeFKlsVIDrrvINsrky', NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25', 'Green Kitchen Restaurant', '03000000002', NULL, NULL, '12 Food Street, Gulberg', 'Lahore', 31.5120000, 74.3450000, 1, 1),
+(49, 'Demo NGO', 'ngo@food.test', 'recipient', NULL, '$2y$10$7i8LRaA3fwI3QZ0T1iKiSunhKKl..Fyp/g.KeFKlsVIDrrvINsrky', NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25', NULL, '03000000003', 'City Food Relief', 'Sara Khan', '45 Hope Avenue, Model Town', 'Lahore', 31.4850000, 74.3200000, 1, 1),
+(50, 'Karachi Kitchen', 'donor.khi@food.test', 'donor', NULL, '$2y$10$STbTHpnFVDYUpu2IjtXDIe0sJFXnd4kfawuFwe9JYpkbFffThqPRi', NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25', 'Harbor Kitchen Karachi', '03000000004', NULL, NULL, 'Clifton Block 5', 'Karachi', 24.8138000, 67.0299000, 1, 1),
+(51, 'Pending NGO', 'ngo.pending@food.test', 'recipient', NULL, '$2y$10$STbTHpnFVDYUpu2IjtXDIe0sJFXnd4kfawuFwe9JYpkbFffThqPRi', NULL, '2026-10-17 17:49:25', '2026-10-17 17:49:25', NULL, '03000000005', 'Waiting Relief', 'Ali Raza', 'Johar Town', 'Lahore', 31.4697000, 74.2728000, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -253,6 +261,14 @@ CREATE TABLE `verification_documents` (
 ALTER TABLE `failed_jobs`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `feedback_food_listing_id_unique` (`food_listing_id`),
+  ADD KEY `feedback_recipient_id_foreign` (`recipient_id`);
 
 --
 -- Indexes for table `food_categories`
@@ -324,28 +340,34 @@ ALTER TABLE `failed_jobs`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `feedback`
+--
+ALTER TABLE `feedback`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `food_categories`
 --
 ALTER TABLE `food_categories`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `food_listings`
 --
 ALTER TABLE `food_listings`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
@@ -357,7 +379,7 @@ ALTER TABLE `personal_access_tokens`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `verification_documents`
@@ -368,6 +390,13 @@ ALTER TABLE `verification_documents`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD CONSTRAINT `feedback_food_listing_id_foreign` FOREIGN KEY (`food_listing_id`) REFERENCES `food_listings` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `feedback_recipient_id_foreign` FOREIGN KEY (`recipient_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `food_listings`
