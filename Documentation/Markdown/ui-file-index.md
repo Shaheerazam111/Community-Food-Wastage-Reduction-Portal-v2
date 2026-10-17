@@ -29,8 +29,8 @@ Login and register screens.
 
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
-| `portal/resources/views/auth/login.blade.php` | Login form + demo role buttons including Pending NGO flash | `/login` (GET, POST), `/login/demo/{role}` |
-| `portal/resources/views/auth/register.blade.php` | Register form with * required markers; NGO fields required when Receiver | `/register` (GET, POST) |
+| `resources/views/auth/login.blade.php` | Login form; demo account hints | `/login`, POST `/auth/login` |
+| `resources/views/auth/register.blade.php` | Register with city, password confirm, map pin, role-specific fields | `/register`, POST `/auth/register` |
 
 ---
 
@@ -40,21 +40,36 @@ Donor dashboard, post/edit/cancel donation, my donations.
 
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
-| `portal/resources/views/donor/dashboard.blade.php` | Summary cards (incl. Meals saved) + recent donations with status badges | `/donor/dashboard` |
-| `portal/resources/views/donor/donations/create.blade.php` | Post donation with map pin picker + multiple food item rows | `/donor/donations/create`, POST `/donor/donations` |
+| `resources/views/donor/dashboard.blade.php` | Status counts + recent listings; unverified banner | `/donor/dashboard` (auth, donor) |
+| `resources/views/donor/donations/create.blade.php` | Post food listing (full form) | `/donor/donations/create`, POST `/food` |
+| `resources/views/donor/donations/edit.blade.php` | Edit or cancel AVAILABLE listing | `/donor/donations/{id}/edit`, POST `/food/{id}`, POST `/food/{id}/cancel` |
+| `resources/views/donor/donations/_form.blade.php` | Shared listing fields + map pin | (included by create/edit) |
+| `resources/views/partials/listing_photo.blade.php` | Food photo thumbnail | (listing tables) |
 | `portal/resources/views/donor/donations/index.blade.php` | My donations table; Edit / Cancel for Available listings | `/donor/donations`, POST `/donor/donations/{id}/cancel` |
 | `portal/resources/views/donor/donations/edit.blade.php` | Edit pickup + map pin + items; Cancel listing button | `/donor/donations/{id}/edit`, POST `/donor/donations/{id}`, POST `.../cancel` |
 | `portal/resources/views/donor/donations/_item_row.blade.php` | Shared row for one food item (name, category, qty, unit, best before, photo) | (included by create/edit) |
 
 ---
 
-## Receiver
+## Recipient (NGO)
 
-NGO/receiver dashboard, browse food (list/map), donation detail + claim, claim history + claim detail.
+Recipient dashboard, find food, my claims.
 
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
-| `portal/resources/views/receiver/dashboard.blade.php` | Nearby food count, available list, recent claims | `/receiver/dashboard` |
+| `resources/views/recipient/dashboard.blade.php` | City/org summary + recent claims | `/recipient/dashboard` (auth, recipient) |
+| `resources/views/recipient/food/index.blade.php` | Nearby search form + results | `/recipient/food`, GET `/food/search` |
+| `resources/views/recipient/claims/index.blade.php` | Claim history with pickup details | `/food/claims` |
+| `resources/views/partials/recipient_nav.blade.php` | Recipient navbar links incl. My profile | (included on recipient pages) |
+| `resources/views/profile/show.blade.php` | Update profile + verification document upload | `/profile`, POST `/profile`, POST `/profile/document` |
+
+## Receiver (legacy stubs — not routed)
+
+Old demo screens kept in repo; live app uses **Recipient** paths above.
+
+| File | What it does | Related route |
+| ---- | ------------ | ------------- |
+| `resources/views/receiver/dashboard.blade.php` | (unused stub) | — |
 | `portal/resources/views/receiver/donations/index.blade.php` | City search + List or Nearby/Map view with OSM pins | `/receiver/donations?view=list\|map` |
 | `portal/resources/views/receiver/donations/show.blade.php` | Donation items, pickup map, claim whole donation | `/receiver/donations/{id}`, POST `.../claim` |
 | `portal/resources/views/receiver/claims/index.blade.php` | Claim history table with Open link to detail | `/receiver/claims` |
@@ -79,7 +94,8 @@ Admin dashboard, users (view doc), moderate listings (reject reason), disputes, 
 
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
-| `portal/resources/views/admin/dashboard.blade.php` | Summary counts + quick action buttons | `/admin/dashboard` |
+| `resources/views/admin/dashboard.blade.php` | User/listing counts; pending verification count | `/admin/dashboard` (auth, admin) |
+| `resources/views/admin/users/index.blade.php` | Approve, reject, block donor/NGO users; view document | `/admin/users`, POST `/admin/users/{id}`, GET `.../document` |
 | `portal/resources/views/admin/users/index.blade.php` | User list; View document modal stub; Approve / Block | `/admin/users`, POST `/admin/users/{id}` |
 | `portal/resources/views/admin/donations/index.blade.php` | Moderate listings + reject reason; recent feedback list | `/admin/donations`, POST `/admin/donations/{id}` |
 | `portal/resources/views/admin/disputes/index.blade.php` | Dispute cards: status select + admin note + Update | `/admin/disputes`, POST `/admin/disputes/{id}` |

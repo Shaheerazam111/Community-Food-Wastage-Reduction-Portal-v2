@@ -75,6 +75,7 @@
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Title</th>
                         <th>Qty</th>
                         <th>Pickup</th>
@@ -85,22 +86,34 @@
                 </thead>
                 <tbody>
                     @forelse ($listings as $listing)
+                        @php
+                            $qty = '—';
+                            if (isset($listing->quantity_value)) {
+                                $unit = ($listing->quantity_unit ?? '') === 'kg' ? 'kg' : 'servings';
+                                $qty = rtrim(rtrim(number_format((float) $listing->quantity_value, 2, '.', ''), '0'), '.').' '.$unit;
+                            }
+                        @endphp
                         <tr>
+                            <td>@include('partials.listing_photo', ['path' => $listing->photo_path ?? null, 'size' => 40])</td>
                             <td>{{ $listing->title }}</td>
-                            <td>{{ $listing->quantity }}</td>
+                            <td>{{ $qty }}</td>
                             <td class="small">{{ $listing->pickup_address }}</td>
                             <td class="small">{{ $listing->expiry_at }}</td>
                             <td>{{ number_format((float) $listing->distance_km, 2) }}</td>
                             <td>
-                                <form method="POST" action="{{ url('/food/'.$listing->id.'/claim') }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-brand" data-confirm="Claim this food?">Claim</button>
-                                </form>
+                                @if (auth()->user()->is_verified)
+                                    <form method="POST" action="{{ url('/food/'.$listing->id.'/claim') }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-brand" data-confirm="Claim this food?">Claim</button>
+                                    </form>
+                                @else
+                                    <span class="small text-muted">Verify account to claim</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-muted p-3">
+                            <td colspan="7" class="text-muted p-3">
                                 @if (! empty($searched))
                                     No available food in this area.
                                 @else

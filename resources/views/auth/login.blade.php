@@ -8,7 +8,7 @@
         <div class="card page-card">
             <div class="card-body">
                 <h1 class="page-title h4">Login</h1>
-                <p class="small text-muted">Form posts to <strong>POST /auth/login</strong> (same as Postman).</p>
+                <p class="small text-muted">Demo accounts (password: <strong>password</strong>): admin@food.test, donor@food.test, ngo@food.test</p>
                 <p class="form-hint"><span class="text-danger">*</span> Required fields</p>
                 <form method="POST" action="{{ url('/auth/login') }}">
                     @csrf

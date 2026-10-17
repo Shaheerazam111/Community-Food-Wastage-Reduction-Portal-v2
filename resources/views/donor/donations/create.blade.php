@@ -3,9 +3,7 @@
 @section('title', 'Post Food')
 
 @section('nav')
-<li class="nav-item"><a class="nav-link" href="{{ url('/donor/dashboard') }}">Dashboard</a></li>
-<li class="nav-item"><a class="nav-link active" href="{{ url('/donor/donations/create') }}">Post food</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ url('/food/mine') }}">My listings</a></li>
+@include('partials.donor_nav')
 @endsection
 
 @section('content')
@@ -15,46 +13,25 @@
 
 <div class="card page-card">
     <div class="card-body">
-        <p class="small text-muted mb-3">
-            Submits to <strong>POST /food</strong>. Pickup address and coordinates are taken from your donor profile (Task 2).
-        </p>
-        @auth
-        <div class="alert alert-light border small mb-3">
-            <strong>Pickup sent with this listing:</strong><br>
-            Address: {{ auth()->user()->address ?? '—' }}<br>
-            Latitude: {{ auth()->user()->latitude ?? '—' }},
-            Longitude: {{ auth()->user()->longitude ?? '—' }}
-        </div>
-        @endauth
-        <form method="POST" action="{{ url('/food') }}">
+        <form method="POST" action="{{ url('/food') }}" enctype="multipart/form-data" id="donor-listing-form">
             @csrf
-            <div class="mb-3">
-                <label for="title" class="form-label required">Food title</label>
-                <input type="text" class="form-control" id="title" name="title" value="{{ old('title') }}" required placeholder="e.g. 20 lunch boxes">
-            </div>
-            <div class="mb-3">
-                <label class="form-label required">Category</label>
-                <div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="category" id="cat_veg" value="veg" {{ old('category', 'veg') === 'veg' ? 'checked' : '' }} required>
-                        <label class="form-check-label" for="cat_veg">Vegetarian</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="category" id="cat_non_veg" value="non_veg" {{ old('category') === 'non_veg' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="cat_non_veg">Non-vegetarian</label>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="quantity" class="form-label required">Quantity</label>
-                <input type="text" class="form-control" id="quantity" name="quantity" value="{{ old('quantity') }}" required placeholder="e.g. 20 boxes">
-            </div>
-            <div class="mb-3">
-                <label for="expiry_at" class="form-label required">Expiry date &amp; time</label>
-                <input type="datetime-local" class="form-control" id="expiry_at" name="expiry_at" value="{{ old('expiry_at') }}" required>
-            </div>
-            <button type="submit" class="btn btn-brand">Save listing</button>
+            @include('donor.donations._form', ['categories' => $categories, 'defaults' => $defaults])
+
+            @if (! auth()->user()->is_verified)
+                <p class="small text-warning mb-2">You must be verified before you can post food.</p>
+                <button type="submit" class="btn btn-brand" disabled>Save listing</button>
+            @else
+                <button type="submit" class="btn btn-brand">Save listing</button>
+            @endif
         </form>
     </div>
 </div>
 @endsection
+
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+@endpush
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+@endpush

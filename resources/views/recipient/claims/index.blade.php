@@ -44,7 +44,7 @@
                         @endphp
                         <tr>
                             <td>{{ $claim->title }}</td>
-                            <td>{{ $claim->quantity }}</td>
+                            <td>{{ $claim->quantity_display }}</td>
                             <td><span class="badge badge-status {{ $badge }}">{{ $claim->status }}</span></td>
                             <td class="small">{{ $claim->claimed_at?->format('Y-m-d H:i') ?? '—' }}</td>
                             <td class="small">

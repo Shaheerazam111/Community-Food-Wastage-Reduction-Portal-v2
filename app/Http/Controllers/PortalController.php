@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\FoodCategory;
 use App\Models\FoodListing;
 use Illuminate\Support\Facades\Auth;
 
@@ -22,13 +23,9 @@ class PortalController extends Controller
 
     public function donorDashboard()
     {
-        if (! $this->loggedInDonor()) {
-            return redirect('/login')->with('error', 'Log in as a donor to continue.');
-        }
-
         $donorId = Auth::id();
         $listings = FoodListing::where('donor_id', $donorId)
-            ->with('claimedBy:id,name,ngo_name')
+            ->with(['claimedBy:id,name,ngo_name', 'foodCategory'])
             ->latest()
             ->take(10)
             ->get();
@@ -44,20 +41,44 @@ class PortalController extends Controller
 
     public function donorCreateForm()
     {
-        if (! $this->loggedInDonor()) {
-            return redirect('/login')->with('error', 'Log in as a donor to continue.');
-        }
-
-        return view('donor.donations.create');
+        return view('donor.donations.create', $this->listingFormData());
     }
 
-    /** Search form defaults; results come from GET /food/search (same API as Postman). */
+    public function donorEditForm($id)
+    {
+        $listing = FoodListing::where('donor_id', Auth::id())
+            ->where('status', 'AVAILABLE')
+            ->findOrFail($id);
+
+        return view('donor.donations.edit', array_merge($this->listingFormData(), [
+            'listing' => $listing,
+        ]));
+    }
+
+    private function listingFormData(): array
+    {
+        return [
+            'categories' => FoodCategory::where('is_active', true)->orderBy('name')->get(),
+            'defaults' => Auth::user(),
+        ];
+    }
+
+    public function recipientDashboard()
+    {
+        $user = Auth::user();
+
+        return view('recipient.dashboard', [
+            'user' => $user,
+            'recentClaims' => FoodListing::where('claimed_by', $user->id)
+                ->latest('claimed_at')
+                ->take(5)
+                ->get(),
+        ]);
+    }
+
+    /** Search form defaults; results come from GET /food/search. */
     public function recipientFoodForm()
     {
-        if (! $this->loggedInRecipient()) {
-            return redirect('/login')->with('error', 'Log in as a recipient (NGO) to continue.');
-        }
-
         $user = Auth::user();
 
         return view('recipient.food.index', [
@@ -69,13 +90,18 @@ class PortalController extends Controller
         ]);
     }
 
-    private function loggedInDonor(): bool
+    public function adminDashboard()
     {
-        return Auth::check() && Auth::user()->role === 'donor';
-    }
+        $stats = [
+            'users' => \App\Models\User::count(),
+            'donors' => \App\Models\User::where('role', 'donor')->count(),
+            'recipients' => \App\Models\User::where('role', 'recipient')->count(),
+            'listings' => FoodListing::count(),
+            'pending_verification' => \App\Models\User::whereIn('role', ['donor', 'recipient'])
+                ->where('is_verified', false)
+                ->count(),
+        ];
 
-    private function loggedInRecipient(): bool
-    {
-        return Auth::check() && Auth::user()->role === 'recipient';
+        return view('admin.dashboard', compact('stats'));
     }
 }

@@ -1,8 +1,9 @@
-{{-- Donor listing table. $listings = FoodListing models (use showClaimInfo on donor pages). --}}
+{{-- Donor listing table. $listings = FoodListing models. --}}
 <div class="table-responsive">
-    <table class="table table-striped mb-0">
+    <table class="table table-striped mb-0 align-middle">
         <thead>
             <tr>
+                <th></th>
                 <th>Title</th>
                 <th>Category</th>
                 <th>Quantity</th>
@@ -13,6 +14,9 @@
                 <th>Status</th>
                 @if (! empty($showClaimInfo))
                     <th>Claimed by</th>
+                @endif
+                @if (! empty($showManageActions))
+                    <th></th>
                 @endif
                 @if (! empty($showDeliverButton))
                     <th></th>
@@ -28,16 +32,24 @@
                         'CLAIMED' => 'badge-claimed',
                         'DELIVERED' => 'badge-delivered',
                         'EXPIRED' => 'badge-expired',
+                        'CANCELLED' => 'badge-closed',
                         default => 'badge-closed',
                     };
                     $expiry = $listing->expiry_at;
                     $expiryText = $expiry instanceof \DateTimeInterface ? $expiry->format('Y-m-d H:i') : (string) $expiry;
                     $claimer = $listing->relationLoaded('claimedBy') ? $listing->claimedBy : null;
+                    $categoryName = $listing->relationLoaded('foodCategory') && $listing->foodCategory
+                        ? $listing->foodCategory->name
+                        : '—';
+                    $qty = $listing instanceof \App\Models\FoodListing
+                        ? $listing->quantity_display
+                        : '—';
                 @endphp
                 <tr>
+                    <td>@include('partials.listing_photo', ['path' => $listing->photo_path ?? null, 'size' => 40])</td>
                     <td>{{ $listing->title }}</td>
-                    <td>{{ $listing->category === 'non_veg' ? 'Non-veg' : 'Veg' }}</td>
-                    <td>{{ $listing->quantity }}</td>
+                    <td>{{ $categoryName }}</td>
+                    <td>{{ $qty }}</td>
                     @if (! empty($showClaimInfo))
                         <td class="small">{{ $listing->pickup_address }}</td>
                     @endif
@@ -47,10 +59,17 @@
                         <td class="small">
                             @if ($claimer)
                                 {{ $claimer->ngo_name ?? $claimer->name }}
-                            @elseif ($status === 'AVAILABLE')
-                                <span class="text-muted">—</span>
                             @else
                                 <span class="text-muted">—</span>
+                            @endif
+                        </td>
+                    @endif
+                    @if (! empty($showManageActions))
+                        <td>
+                            @if ($status === 'AVAILABLE')
+                                <a href="{{ url('/donor/donations/'.$listing->id.'/edit') }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            @else
+                                <span class="text-muted small">—</span>
                             @endif
                         </td>
                     @endif
@@ -70,9 +89,12 @@
             @empty
                 <tr>
                     @php
-                        $cols = 5;
+                        $cols = 6;
                         if (! empty($showClaimInfo)) {
-                            $cols += 2;
+                            $cols += 1;
+                        }
+                        if (! empty($showManageActions)) {
+                            $cols += 1;
                         }
                         if (! empty($showDeliverButton)) {
                             $cols += 1;

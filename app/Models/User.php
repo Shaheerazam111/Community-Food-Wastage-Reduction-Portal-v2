@@ -23,6 +23,9 @@ class User extends Authenticatable
         'address',
         'latitude',
         'longitude',
+        'city',
+        'is_verified',
+        'is_active',
     ];
 
     protected $hidden = [
@@ -32,10 +35,17 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_verified' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     public function foodListings()
     {
         return $this->hasMany(FoodListing::class, 'donor_id');
+    }
+
+    public function verificationDocument()
+    {
+        return $this->hasOne(VerificationDocument::class);
     }
 }

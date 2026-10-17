@@ -64,7 +64,4 @@
     </div>
 </section>
 
-<p class="small text-muted text-center mb-0">
-    API playground: <a href="{{ url('/test-apis') }}">/test-apis</a>
-</p>
 @endsection

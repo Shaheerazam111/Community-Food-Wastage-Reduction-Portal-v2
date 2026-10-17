@@ -52,6 +52,10 @@
             </div>
         @endif
 
+        <div class="mb-3">
+            @include('partials.unverified_banner')
+        </div>
+
         @yield('content')
     </main>
 

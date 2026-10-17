@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -12,10 +13,14 @@ class FoodListing extends Model
 
     protected $fillable = [
         'donor_id',
+        'category_id',
         'title',
-        'category',
-        'quantity',
+        'description',
+        'quantity_value',
+        'quantity_unit',
+        'photo_path',
         'pickup_address',
+        'city',
         'latitude',
         'longitude',
         'expiry_at',
@@ -29,6 +34,7 @@ class FoodListing extends Model
         'expiry_at' => 'datetime',
         'claimed_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'quantity_value' => 'float',
     ];
 
     public function donor()
@@ -39,6 +45,24 @@ class FoodListing extends Model
     public function claimedBy()
     {
         return $this->belongsTo(User::class, 'claimed_by');
+    }
+
+    public function foodCategory()
+    {
+        return $this->belongsTo(FoodCategory::class, 'category_id');
+    }
+
+    protected function quantityDisplay(): Attribute
+    {
+        return Attribute::get(function () {
+            if ($this->quantity_value === null) {
+                return '—';
+            }
+
+            $unit = $this->quantity_unit === 'kg' ? 'kg' : 'servings';
+
+            return rtrim(rtrim(number_format((float) $this->quantity_value, 2, '.', ''), '0'), '.').' '.$unit;
+        });
     }
 
     /**
@@ -52,11 +76,11 @@ class FoodListing extends Model
         )';
 
         return DB::table('food_listings')
-            ->selectRaw('*, '.$distanceExpr.' AS distance_km', [
+            ->selectRaw('food_listings.*, '.$distanceExpr.' AS distance_km', [
                 $latitude, $longitude, $latitude,
             ])
-            ->where('status', 'AVAILABLE')
-            ->where('expiry_at', '>', now())
+            ->where('food_listings.status', 'AVAILABLE')
+            ->where('food_listings.expiry_at', '>', now())
             ->havingRaw('distance_km <= ?', [$radiusKm])
             ->orderBy('distance_km')
             ->get();

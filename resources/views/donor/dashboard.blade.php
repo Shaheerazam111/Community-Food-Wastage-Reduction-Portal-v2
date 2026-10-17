@@ -3,9 +3,7 @@
 @section('title', 'Donor Dashboard')
 
 @section('nav')
-<li class="nav-item"><a class="nav-link active" href="{{ url('/donor/dashboard') }}">Dashboard</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ url('/donor/donations/create') }}">Post food</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ url('/food/mine') }}">My listings</a></li>
+@include('partials.donor_nav')
 @endsection
 
 @section('content')
@@ -41,7 +39,12 @@
         <a href="{{ url('/food/mine') }}" class="small">View all (GET /food/mine)</a>
     </div>
     <div class="card-body p-0">
-        @include('partials.listings_table', ['listings' => $listings, 'showDeliverButton' => true, 'showClaimInfo' => true])
+        @include('partials.listings_table', [
+            'listings' => $listings,
+            'showDeliverButton' => true,
+            'showClaimInfo' => true,
+            'showManageActions' => true,
+        ])
     </div>
 </div>
 @endsection

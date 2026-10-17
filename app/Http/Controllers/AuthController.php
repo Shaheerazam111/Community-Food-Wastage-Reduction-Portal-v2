@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -18,18 +19,22 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => ['required', 'confirmed', Password::min(6)],
             'role' => ['required', Rule::in(['donor', 'recipient'])],
-            'business_name' => 'nullable|string|max:255',
+            'business_name' => ['nullable', Rule::requiredIf($request->input('role') === 'donor'), 'string', 'max:255'],
             'phone' => 'nullable|string|max:30',
-            'ngo_name' => 'nullable|string|max:255',
+            'ngo_name' => ['nullable', Rule::requiredIf($request->input('role') === 'recipient'), 'string', 'max:255'],
             'contact_person' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:100',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ]);
 
         $data['password'] = Hash::make($data['password']);
+        $data['is_verified'] = false;
+        $data['is_active'] = true;
+
         $user = User::create($data);
 
         Auth::login($user);
@@ -39,7 +44,7 @@ class AuthController extends Controller
             ['user' => $user],
             201,
             $this->homeForRole($user->role),
-            'Account created. You are now logged in.'
+            'Account created. You are logged in. An admin will verify your account before you can post or claim food.'
         );
     }
 
@@ -59,8 +64,22 @@ class AuthController extends Controller
             );
         }
 
-        $request->session()->regenerate();
         $user = Auth::user();
+
+        if (! $user->is_active) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return $this->portalBack(
+                $request,
+                ['message' => 'Account blocked'],
+                403,
+                'This account is blocked.'
+            );
+        }
+
+        $request->session()->regenerate();
 
         return $this->portalRedirect(
             $request,
@@ -88,10 +107,10 @@ class AuthController extends Controller
 
     private function homeForRole(string $role): string
     {
-        if ($role === 'donor') {
-            return '/donor/dashboard';
-        }
-
-        return '/recipient/food';
+        return match ($role) {
+            'donor' => '/donor/dashboard',
+            'admin' => '/admin/dashboard',
+            default => '/recipient/dashboard',
+        };
     }
 }
