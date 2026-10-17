@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesPortalResponses;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,8 @@ use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
+    use HandlesPortalResponses;
+
     public function register(Request $request)
     {
         $data = $request->validate([
@@ -31,7 +34,13 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return response()->json(['user' => $user], 201);
+        return $this->portalRedirect(
+            $request,
+            ['user' => $user],
+            201,
+            $this->homeForRole($user->role),
+            'Account created. You are now logged in.'
+        );
     }
 
     public function login(Request $request)
@@ -42,12 +51,24 @@ class AuthController extends Controller
         ]);
 
         if (! Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return $this->portalBack(
+                $request,
+                ['message' => 'Invalid credentials'],
+                401,
+                'Wrong email or password.'
+            );
         }
 
         $request->session()->regenerate();
+        $user = Auth::user();
 
-        return response()->json(['user' => Auth::user()]);
+        return $this->portalRedirect(
+            $request,
+            ['user' => $user],
+            200,
+            $this->homeForRole($user->role),
+            'Welcome back, '.$user->name.'.'
+        );
     }
 
     public function logout(Request $request)
@@ -56,11 +77,21 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Logged out']);
+        return $this->portalRedirect(
+            $request,
+            ['message' => 'Logged out'],
+            200,
+            '/',
+            'Logged out.'
+        );
     }
 
-    public function unauthenticated()
+    private function homeForRole(string $role): string
     {
-        return response()->json(['message' => 'Unauthenticated'], 401);
+        if ($role === 'donor') {
+            return '/donor/dashboard';
+        }
+
+        return '/recipient/food';
     }
 }

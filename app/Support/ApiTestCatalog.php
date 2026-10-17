@@ -330,6 +330,18 @@ class ApiTestCatalog
                     'usesListingId' => true,
                     'fields' => [],
                 ],
+                [
+                    'id' => 'my-claims',
+                    'name' => 'My Claims (Recipient A)',
+                    'method' => 'GET',
+                    'path' => '/food/claims',
+                    'auth' => true,
+                    'role' => 'recipient',
+                    'task' => 'Task 4',
+                    'expects' => '200 — claims array with status CLAIMED',
+                    'description' => 'After a successful claim, recipient sees claimed food and donor pickup details.',
+                    'fields' => [],
+                ],
             ],
         ];
     }

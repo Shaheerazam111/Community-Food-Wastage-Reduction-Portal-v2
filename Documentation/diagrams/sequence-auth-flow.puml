@@ -1,0 +1,59 @@
+@startuml Auth_And_User_Flow
+title Sequence Diagram 1 — Auth & User Management Flow
+
+actor User
+actor Admin
+participant "Blade View" as View
+participant "AuthController" as AC
+participant "AdminController" as ADC
+participant "Middleware\nAuth + Role" as MW
+participant "Eloquent Models\nUser + VerificationDocument" as ORM
+database "MySQL" as DB
+participant "NotificationController" as NC
+participant "File Storage" as FS
+
+== Registration ==
+User -> View: Register (Donor / NGO / Volunteer)
+View -> AC: register(userData)
+AC -> AC: validate + hash password
+AC -> ORM: save user
+ORM -> DB: INSERT users
+alt NGO uploads verification document
+  AC -> FS: save file
+  AC -> ORM: save document,\nstatus = Pending
+  ORM -> DB: INSERT verification_documents
+  AC --> User: Wait for admin approval
+else Donor or Volunteer
+  AC -> ORM: activate account
+  ORM -> DB: UPDATE users
+  AC --> User: Register OK — login now
+end
+
+== Login ==
+User -> View: Enter email + password
+View -> AC: login(email, password)
+AC -> ORM: find user
+ORM -> DB: SELECT users
+alt invalid login
+  AC --> User: Invalid email or password
+else NGO still pending
+  AC --> User: Account not active yet
+else login success
+  AC -> MW: check role
+  MW --> User: Open role dashboard\n(Donor / NGO / Volunteer / Admin)
+end
+
+== Logout ==
+User -> View: Click Logout
+View -> AC: logout()
+AC -> AC: destroy session
+AC --> User: Redirect to login page
+
+== Admin Verify NGO ==
+Admin -> ADC: reviewDocument(approve/reject)
+ADC -> ORM: update user + document
+ORM -> DB: UPDATE users,\nverification_documents
+ADC -> NC: send alert
+NC --> User: NGO notified\n(account approved or rejected)
+
+@enduml

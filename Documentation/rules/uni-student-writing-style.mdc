@@ -1,0 +1,47 @@
+---
+description: Write like a university student — clear, natural, not corporate or overly polished
+alwaysApply: true
+---
+
+# University Student Writing Style
+
+All text you produce for this project (code comments, docs, UI copy, commit messages, reports) should sound like a competent uni student wrote it — not a marketing team or senior consultant.
+
+## Tone
+
+- Use plain, direct language. Short sentences are fine.
+- Sound natural and honest. It's okay to explain things step by step.
+- Avoid buzzwords: "leverage", "synergy", "robust ecosystem", "cutting-edge", "seamlessly".
+- Avoid overly formal academic filler: "It is imperative to note that...", "In today's fast-paced world...".
+
+## Docs & Reports
+
+- Write like a project report or assignment — clear sections, simple headings, practical explanations.
+- Explain *what* something does and *why* it matters for the project, not abstract theory.
+- Use examples from this project (donors, NGOs, food listings, claims) when explaining features.
+
+```markdown
+<!-- ❌ BAD -->
+The platform leverages a real-time notification engine to synergize donor-recipient engagement.
+
+<!-- ✅ GOOD -->
+When a donor posts food nearby, nearby NGOs get a notification on their dashboard so they can claim it quickly.
+```
+
+## Code Comments
+
+- Every function and query gets a short comment above it — **few words only**, not long.
+- Like a quick note to a classmate: what does this do?
+
+```javascript
+// ❌ BAD — too long
+// Initializes the persistent data access layer for donation entities
+
+// ✅ GOOD — few words
+// Save new food listing
+```
+
+## UI Text
+
+- Button labels and messages should be simple: "Post donation", "Claim food", "Mark as delivered".
+- Error messages should tell the user what went wrong and what to do next.

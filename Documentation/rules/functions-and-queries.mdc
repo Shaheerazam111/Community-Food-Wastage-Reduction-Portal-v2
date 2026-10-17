@@ -1,0 +1,67 @@
+---
+description: One job per function/query, with a short plain comment above each
+alwaysApply: true
+---
+
+# Functions & Queries
+
+Every function and every database query gets **one short comment** above it — a few words only. No long paragraphs.
+
+## Comments
+
+- Say what it does in plain words, like explaining to a friend.
+- **3–8 words** is enough. One line max.
+- Comment every function and every SQL/query block — not every single line inside.
+
+```javascript
+// ❌ BAD — too long
+// This function takes the donor id from the request, validates all required fields,
+// checks if the user is verified, then inserts a new donation record into MongoDB
+// and returns the created document with a 201 status code.
+
+// ✅ GOOD
+// Add a new food donation
+async function createDonation(req, res) { ... }
+
+// ✅ GOOD
+// Get available food near a city
+function getNearbyDonations(city) { ... }
+```
+
+```sql
+-- ❌ BAD
+-- Retrieves all donation records from the donations table where status is available
+-- and the best_before timestamp is greater than the current time, ordered by date
+
+-- ✅ GOOD
+-- List food still available
+SELECT * FROM donations WHERE status = 'available' AND best_before > NOW();
+```
+
+## One Thing Per Function
+
+- Each function does **one job only**. If it does two jobs, split it.
+- Name the function after that one job: `validateDonation`, `saveDonation`, `sendClaimAlert`.
+- Don't mix validation + save + email in one function.
+
+```javascript
+// ❌ BAD — does too much in one place
+async function handleDonation(req, res) {
+  // validate, save, notify NGOs, update stats, send email...
+}
+
+// ✅ GOOD — split into small pieces
+// Check donation form fields
+function validateDonation(data) { ... }
+
+// Save donation to database
+async function saveDonation(data) { ... }
+
+// Notify nearby NGOs
+async function notifyNearbyNGOs(donation) { ... }
+```
+
+## Queries
+
+- One query = one purpose. Don't cram unrelated reads/writes into one query.
+- If you need join + filter + sort for one screen, that's fine — it's still one job (e.g. "get donor dashboard listings").

@@ -2,21 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesPortalResponses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ClaimController extends Controller
 {
-    // TASK 4 + Challenge 2: atomic claim, safe against simultaneous clicks
+    use HandlesPortalResponses;
+
     public function claim(Request $request, $id)
     {
         if (Auth::user()->role !== 'recipient') {
-            return response()->json(['message' => 'Only recipients can claim food'], 403);
+            return $this->portalBack(
+                $request,
+                ['message' => 'Only recipients can claim food'],
+                403,
+                'Only recipients can claim food.'
+            );
         }
 
-        // Single atomic UPDATE: only succeeds if the row is still AVAILABLE.
-        // If two requests race, only one UPDATE can flip the row - the other gets 0 rows affected.
         $updated = DB::table('food_listings')
             ->where('id', $id)
             ->where('status', 'AVAILABLE')
@@ -29,9 +34,22 @@ class ClaimController extends Controller
             ]);
 
         if ($updated === 0) {
-            return response()->json(['message' => 'This item was already claimed or has expired'], 409);
+            return $this->portalBack(
+                $request,
+                ['message' => 'This item was already claimed or has expired'],
+                409,
+                'This food was already claimed or has expired.'
+            );
         }
 
-        return response()->json(['message' => 'Claim successful']);
+        $redirectUrl = $this->wantsJson($request) ? url()->previous() : '/food/claims';
+
+        return $this->portalRedirect(
+            $request,
+            ['message' => 'Claim successful'],
+            200,
+            $redirectUrl,
+            'Claim successful (POST /food/'.$id.'/claim). Pickup details are under My claims.'
+        );
     }
 }

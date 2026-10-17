@@ -1,0 +1,38 @@
+---
+description: Official stack is Laravel, Blade, Bootstrap 5, plain JS, MySQL — no SPA frameworks
+alwaysApply: true
+---
+
+# Laravel Stack
+
+This portal uses **Laravel + Blade + Bootstrap 5 + plain CSS + plain JS + MySQL**. Stick to that.
+
+## Allowed
+
+- Blade views, Bootstrap 5 (CDN or local), small custom CSS, plain JavaScript
+- Thin controllers; one method ≈ one action (Auth, Donation, Claim, Notification, Admin, Volunteer)
+- Forms with Blade + `@csrf`; simple validation in the controller or a Form Request
+
+## Do Not Add (unless the user asks)
+
+- React, Vue, Tailwind, Livewire, Inertia, Alpine, or other SPA patterns
+- Extra packages “for later” that the design doc does not need
+
+```php
+// ❌ BAD — SPA / extra framework for a form
+return Inertia::render('Donation/Create');
+
+// ✅ GOOD — normal Blade form page
+return view('donor.donations.create');
+```
+
+```blade
+{{-- ❌ BAD --}}
+<form method="POST" action="/donations">
+
+{{-- ✅ GOOD --}}
+<form method="POST" action="{{ route('donations.store') }}">
+    @csrf
+    {{-- fields --}}
+</form>
+```

@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HandlesPortalResponses;
 use App\Models\FoodListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class FoodListingController extends Controller
 {
-    // TASK 2: Donor creates a food listing
+    use HandlesPortalResponses;
+
     public function store(Request $request)
     {
         if (Auth::user()->role !== 'donor') {
-            return response()->json(['message' => 'Only donors can create listings'], 403);
+            return $this->portalBack(
+                $request,
+                ['message' => 'Only donors can create listings'],
+                403,
+                'Only donors can create listings.'
+            );
         }
 
         $data = $request->validate([
@@ -27,9 +33,12 @@ class FoodListingController extends Controller
         $donor = Auth::user();
 
         if ($donor->latitude === null || $donor->longitude === null) {
-            return response()->json([
-                'message' => 'Donor profile must have latitude and longitude (set during registration).',
-            ], 422);
+            return $this->portalBack(
+                $request,
+                ['message' => 'Donor profile must have latitude and longitude (set during registration).'],
+                422,
+                'Your profile needs a map location from registration.'
+            );
         }
 
         $data['donor_id'] = $donor->id;
@@ -39,20 +48,33 @@ class FoodListingController extends Controller
 
         $listing = FoodListing::create($data);
 
-        return response()->json(['listing' => $listing], 201);
+        return $this->portalRedirect(
+            $request,
+            ['listing' => $listing],
+            201,
+            '/food/mine',
+            'Food listing posted (POST /food).'
+        );
     }
 
-    // Donor's own listings
-    public function myListings()
+    public function myListings(Request $request)
     {
         $listings = FoodListing::where('donor_id', Auth::id())
+            ->with('claimedBy:id,name,ngo_name')
             ->latest()
             ->get();
 
-        return response()->json(['listings' => $listings]);
+        if ($this->wantsJson($request)) {
+            return response()->json(['listings' => $listings]);
+        }
+
+        if (Auth::user()->role !== 'donor') {
+            return redirect('/login')->with('error', 'Log in as a donor to see your listings.');
+        }
+
+        return view('donor.donations.index', compact('listings'));
     }
 
-    // TASK 3 + Challenge 1 + Challenge 3: nearby search, sorted by distance
     public function search(Request $request)
     {
         $data = $request->validate([
@@ -63,35 +85,49 @@ class FoodListingController extends Controller
 
         $radiusKm = $data['radius_km'] ?? 5;
 
-        $distanceExpr = '6371 * ACOS(
-            COS(RADIANS(?)) * COS(RADIANS(latitude)) * COS(RADIANS(longitude) - RADIANS(?))
-            + SIN(RADIANS(?)) * SIN(RADIANS(latitude))
-        )';
+        $listings = FoodListing::searchAvailableNearby(
+            (float) $data['latitude'],
+            (float) $data['longitude'],
+            (float) $radiusKm
+        );
 
-        $listings = DB::table('food_listings')
-            ->selectRaw('*, ' . $distanceExpr . ' AS distance_km', [
-                $data['latitude'], $data['longitude'], $data['latitude'],
-            ])
-            ->where('status', 'AVAILABLE')
-            ->where('expiry_at', '>', now())
-            ->havingRaw('distance_km <= ?', [$radiusKm])
-            ->orderBy('distance_km')
-            ->get();
+        if ($this->wantsJson($request)) {
+            return response()->json(['listings' => $listings]);
+        }
 
-        return response()->json(['listings' => $listings]);
+        if (! Auth::check() || Auth::user()->role !== 'recipient') {
+            return redirect('/login')->with('error', 'Log in as a recipient (NGO) to search food.');
+        }
+
+        return view('recipient.food.index', [
+            'listings' => $listings,
+            'latitude' => $data['latitude'],
+            'longitude' => $data['longitude'],
+            'radius_km' => $radiusKm,
+            'searched' => true,
+        ]);
     }
 
-    // TASK 2: status transition CLAIMED -> DELIVERED
-    public function markDelivered($id)
+    public function markDelivered(Request $request, $id)
     {
         $listing = FoodListing::findOrFail($id);
 
         if ($listing->donor_id !== Auth::id()) {
-            return response()->json(['message' => 'Only the donor can mark this delivered'], 403);
+            return $this->portalBack(
+                $request,
+                ['message' => 'Only the donor can mark this delivered'],
+                403,
+                'Only the donor can mark this delivered.'
+            );
         }
 
         if ($listing->status !== 'CLAIMED') {
-            return response()->json(['message' => 'Listing must be CLAIMED before it can be DELIVERED'], 422);
+            return $this->portalBack(
+                $request,
+                ['message' => 'Listing must be CLAIMED before it can be DELIVERED'],
+                422,
+                'Listing must be CLAIMED before it can be DELIVERED.'
+            );
         }
 
         $listing->update([
@@ -99,6 +135,36 @@ class FoodListingController extends Controller
             'delivered_at' => now(),
         ]);
 
-        return response()->json(['listing' => $listing]);
+        $back = url()->previous();
+        if ($back === url()->current()) {
+            $back = '/food/mine';
+        }
+
+        return $this->portalRedirect(
+            $request,
+            ['listing' => $listing],
+            200,
+            $back,
+            'Listing marked DELIVERED (POST /food/'.$id.'/deliver).'
+        );
+    }
+
+    /** Food this recipient has claimed (AVAILABLE → CLAIMED → DELIVERED lifecycle). */
+    public function myClaims(Request $request)
+    {
+        $listings = FoodListing::where('claimed_by', Auth::id())
+            ->with('donor:id,name,business_name,phone,address,latitude,longitude')
+            ->orderByDesc('claimed_at')
+            ->get();
+
+        if ($this->wantsJson($request)) {
+            return response()->json(['claims' => $listings]);
+        }
+
+        if (Auth::user()->role !== 'recipient') {
+            return redirect('/login')->with('error', 'Log in as a recipient (NGO) to see your claims.');
+        }
+
+        return view('recipient.claims.index', ['claims' => $listings]);
     }
 }

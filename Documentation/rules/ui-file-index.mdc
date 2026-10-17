@@ -1,0 +1,29 @@
+---
+description: Keep docs/Markdown/ui-file-index.md in sync whenever UI files change
+alwaysApply: true
+---
+
+# UI File Index
+
+The source of truth for every UI screen file is [`docs/Markdown/ui-file-index.md`](docs/Markdown/ui-file-index.md).
+
+## When to update
+
+Whenever you **add, rename, or remove** any of these, update the matching section in that doc in the same change:
+
+- Blade views under `portal/resources/views/`
+- Shared CSS / JS used by screens (`portal/public/css/`, `portal/public/js/`)
+- UI routes in `portal/routes/web.php`
+- Controllers or helpers that only serve UI stubs (e.g. `PageController`, `DemoData`)
+
+## Checklist (after a UI change)
+
+1. Open `docs/Markdown/ui-file-index.md`
+2. Find the entity section: **Shared**, **Auth**, **Donor**, **Receiver**, **Volunteer**, **Admin**, or **Backend for UI**
+3. Add / edit / remove the row: file path | what it does | related route
+4. Do not leave renamed or deleted files listed
+
+## Do not
+
+- Skip the index update “for later”
+- Put UI file lists only in chat or commit messages — the markdown index is the record

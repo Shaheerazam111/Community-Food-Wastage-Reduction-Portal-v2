@@ -1,0 +1,45 @@
+@startuml Dispute_Flow
+title Sequence Diagram 3 — Dispute Handling
+
+actor User as "Donor / NGO"
+actor Admin
+participant "Blade View" as View
+participant "ClaimController" as CC
+participant "AdminController" as ADC
+participant "Eloquent Model\nDispute" as ORM
+database "MySQL" as DB
+participant "NotificationController" as NC
+actor Donor
+actor NGO
+
+== Raise Dispute ==
+User -> View: Open claim / donation\nSubmit dispute reason
+View -> CC: raiseDispute(claimId, description)
+CC -> ORM: save dispute record
+ORM -> DB: INSERT disputes\nstatus = Open
+CC -> NC: alert admin
+NC --> Admin: New dispute ticket
+
+== Admin Resolve Dispute ==
+Admin -> View: Open dispute list\nRead donor + NGO details
+View -> ADC: handleDispute(disputeId, note, status)
+ADC -> ORM: read dispute + claim + donation
+ORM -> DB: SELECT disputes, claims, donations
+
+alt invalid dispute
+  ADC -> ORM: close as invalid
+  ORM -> DB: UPDATE disputes = Closed
+  ADC -> NC: notify both parties
+  NC --> Donor: Dispute closed
+  NC --> NGO: Dispute closed
+else valid dispute
+  ADC -> ORM: add admin note,\nupdate donation/claim status
+  ORM -> DB: UPDATE disputes = Resolved,\nUPDATE donations / claims
+  ADC -> NC: send decision
+  NC --> Donor: Dispute resolved
+  NC --> NGO: Dispute resolved
+end
+
+ADC --> Admin: Dispute handled
+
+@enduml

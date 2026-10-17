@@ -1,0 +1,43 @@
+@startuml Donation_Process_Flow
+title Sequence Diagram 2 — Full Donation Process
+
+actor Donor
+actor NGO
+actor Volunteer
+participant "DonationController" as DC
+participant "ClaimController" as CC
+participant "VolunteerController" as VC
+participant "NotificationController" as NC
+database "MySQL" as DB
+
+== Post Donation ==
+Donor -> DC: createDonation(items, address, expiry)
+DC -> DB: INSERT donations,\nINSERT donation_items
+DC --> Donor: Donation Created
+DC -> NC: sendNewListingAlert()
+NC -> DB: INSERT notifications
+NC --> NGO: New food nearby
+
+== Claim Food ==
+NGO -> CC: claimDonation(donationId)
+CC -> DB: check status = Available
+alt already claimed
+  CC --> NGO: Error — already claimed
+else claim success
+  CC -> DB: INSERT claim,\nUPDATE donation = Claimed
+  CC -> NC: alert donor
+  NC --> Donor: Donation claimed
+  CC --> NGO: Claim Created
+end
+
+== Pickup & Delivery ==
+CC -> VC: assign volunteer task
+VC -> DB: INSERT volunteer_tasks
+VC --> Volunteer: Pickup task assigned
+Volunteer -> VC: updateTaskStatus(Completed)
+VC -> DB: UPDATE task, claim,\ndonation = Delivered
+VC -> NC: sendStatusUpdateAlert()
+NC --> Donor: Pickup done
+NC --> NGO: Pickup done
+
+@enduml

@@ -59,7 +59,30 @@ DB_USERNAME=root
 DB_PASSWORD=secret
 ```
 
-**Local MySQL:**
+**phpMyAdmin (XAMPP / LAMP / local MySQL):**
+
+1. In phpMyAdmin, create database **`cfwrp_v2`** (collation `utf8mb4_unicode_ci`).
+2. In `.env` set:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=cfwrp_v2
+DB_USERNAME=root
+DB_PASSWORD=your_mysql_root_password
+```
+
+Use the same **username/password** you use to log into phpMyAdmin. If root has no password, leave `DB_PASSWORD=` empty.
+
+3. Clear config cache and migrate:
+
+```bash
+php artisan config:clear
+php artisan migrate
+```
+
+**Local MySQL (CLI):**
 
 ```bash
 mysql -u root -p -e "CREATE DATABASE cfwrp_v2 CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"

@@ -1,0 +1,44 @@
+---
+description: Keep code, design, and features simple — easy to build, read, and use
+alwaysApply: true
+---
+
+# Keep It Simple
+
+This is a uni web project. Prefer straightforward solutions over clever or over-engineered ones.
+
+## Code
+
+- Use the simplest approach that works. Don't add abstractions "for later".
+- One file, one job. Avoid deep folder trees and wrapper layers unless the project already uses them.
+- Reuse plain patterns: simple functions, basic components, direct API calls.
+- Match the stack: **Laravel + Blade + Bootstrap + MySQL** (plain CSS/JS). Do not switch to React/Vue/Tailwind unless asked.
+- Don't introduce extra libraries unless they clearly save time (e.g. maps API for pickup location).
+
+```php
+// ❌ BAD — factory + strategy + config object for one form
+$handler = DonationFormFactory::make($config)->handle($request);
+
+// ✅ GOOD — a normal controller method
+// Save new food listing
+public function store(Request $request) {
+    // validate, save, redirect
+}
+```
+
+## Features
+
+- Build what the requirements ask for first. Skip nice-to-haves until core flows work.
+- Core flows: register/login → post donation → search/claim → track status → basic notifications.
+- Prefer a working simple version over a half-finished complex one.
+
+## UI/UX
+
+- Clean layout, obvious buttons, readable labels. No fancy animations unless asked.
+- Forms: only the fields needed (food name, category, quantity, expiry, address).
+- Dashboards: show the important info first (active listings, nearby food, status).
+
+## When Stuck
+
+- Pick the option that is easier to explain in a viva or demo.
+- If two approaches work, choose the one with less code and fewer moving parts.

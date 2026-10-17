@@ -1,0 +1,42 @@
+---
+description: Small Laravel PHP methods — one job each, short comments
+globs: "**/*.php"
+alwaysApply: false
+---
+
+# Laravel PHP
+
+Controllers and queries stay small and easy to explain in a viva.
+
+## Rules
+
+- Every function and query gets a **3–8 word** comment above it.
+- One method = one job. Split validate / save / notify into separate methods.
+- Prefer short controller methods that call one model or query helper.
+- No service-layer factories or deep folders unless the project already has them.
+
+```php
+// ❌ BAD — too much in one method
+public function handleDonation(Request $request) {
+    // validate, save, notify NGOs, update stats...
+}
+
+// ✅ GOOD — one job
+// Check donation form fields
+private function validateDonation(array $data) { ... }
+
+// Save donation to database
+private function saveDonation(array $data) { ... }
+
+// Notify nearby NGOs
+private function notifyNearbyNGOs(Donation $donation) { ... }
+```
+
+```php
+// ❌ BAD — long comment
+// This loads every available donation for the NGO city including expired ones filtered later
+
+// ✅ GOOD
+// List available food in city
+$donations = Donation::where('city', $city)->where('status', 'Available')->get();
+```

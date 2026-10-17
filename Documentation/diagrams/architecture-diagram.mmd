@@ -1,0 +1,71 @@
+flowchart TB
+    subgraph Presentation["Presentation Tier / Client Tier"]
+        Browser["User Browser"]
+        Blade["Blade Templates (Views)"]
+        UI["HTML / CSS / Bootstrap / JavaScript"]
+    end
+
+    subgraph Application["Application Tier / Laravel Backend"]
+        WS["Web Server\nApache or Nginx + PHP 8"]
+        Routes["Routes\nweb.php"]
+        MW["Middleware\nAuth + Role Check"]
+        Controllers["Controllers Layer"]
+        AuthCtrl["AuthController"]
+        DonCtrl["DonationController"]
+        ClaimCtrl["ClaimController"]
+        NotifyCtrl["NotificationController"]
+        AdminCtrl["AdminController"]
+        VolCtrl["VolunteerController"]
+        Eloquent["Eloquent ORM\nLaravel Models"]
+    end
+
+    subgraph Data["Data Tier / Database Tier"]
+        DB[("MySQL Database")]
+        T1["users"]
+        T2["donations"]
+        T3["donation_items"]
+        T4["claims"]
+        T5["notifications"]
+        T6["feedback"]
+        T7["verification_documents"]
+        T8["disputes"]
+        T9["volunteer_tasks"]
+    end
+
+    subgraph External["External Services"]
+        Maps["Google Maps API"]
+        Storage["Local File Storage\nfood photos + NGO documents"]
+    end
+
+    Browser --> Blade
+    Blade --> UI
+    UI -->|"1. HTTP Request"| WS
+    WS -->|"2. Route match"| Routes
+    Routes -->|"3. Check login/role"| MW
+    MW -->|"4. Call controller"| Controllers
+    Controllers --> AuthCtrl
+    Controllers --> DonCtrl
+    Controllers --> ClaimCtrl
+    Controllers --> NotifyCtrl
+    Controllers --> AdminCtrl
+    Controllers --> VolCtrl
+    AuthCtrl -->|"5. Read/Write data"| Eloquent
+    DonCtrl --> Eloquent
+    ClaimCtrl --> Eloquent
+    NotifyCtrl --> Eloquent
+    AdminCtrl --> Eloquent
+    VolCtrl --> Eloquent
+    Eloquent -->|"6. SQL queries"| DB
+    DB --- T1
+    DB --- T2
+    DB --- T3
+    DB --- T4
+    DB --- T5
+    DB --- T6
+    DB --- T7
+    DB --- T8
+    DB --- T9
+    DonCtrl -.->|"7. Map search"| Maps
+    DonCtrl -.-> Storage
+    AuthCtrl -.-> Storage
+    AdminCtrl -.-> Storage

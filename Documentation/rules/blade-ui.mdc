@@ -1,0 +1,39 @@
+---
+description: Simple mobile-first Blade UI with Bootstrap — one layout, clear forms
+globs: "**/*.blade.php,**/public/css/**,**/public/js/**"
+alwaysApply: false
+---
+
+# Blade UI
+
+Keep screens simple, readable, and usable on a phone.
+
+## Layout
+
+- One shared layout: `layouts/app.blade.php` — navbar, flash alerts, `@yield('content')`, footer.
+- Use Bootstrap grid: `container`, `row`, `col-12` first, then `md` / `lg` for desktop.
+- Minimal custom CSS (CSS variables for brand colors only). No heavy animations.
+
+## Forms & Lists
+
+- Only the fields we need (food name, category, quantity, expiry, address).
+- Cards only when they help a form or list. Plain tables/lists are fine.
+- Button labels stay plain: “Post donation”, “Claim food”, “Mark as delivered”.
+
+## JavaScript
+
+- Tiny plain JS only (confirm delete, toggle password, basic checks). No JS frameworks.
+
+```blade
+{{-- ❌ BAD — fixed desktop columns, no mobile stack --}}
+<div class="row">
+  <div class="col-3">...</div>
+  <div class="col-9">...</div>
+</div>
+
+{{-- ✅ GOOD — mobile first --}}
+<div class="row">
+  <div class="col-12 col-md-4">...</div>
+  <div class="col-12 col-md-8">...</div>
+</div>
+```
