@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\HandlesPortalResponses;
 use App\Models\FoodCategory;
 use App\Models\FoodListing;
+use App\Support\PortalNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -27,6 +28,8 @@ class FoodListingController extends Controller
         }
 
         $listing = FoodListing::create($data);
+
+        PortalNotifier::notifyRecipientsNewListing($listing);
 
         return $this->portalRedirect(
             $request,
@@ -88,43 +91,87 @@ class FoodListingController extends Controller
 
     public function search(Request $request)
     {
+        $user = Auth::user();
+        $mode = $request->input('search_mode', 'nearby');
+        $listingCities = FoodListing::citiesWithAvailableFood();
+
+        if ($mode === 'city') {
+            $data = $request->validate([
+                'city' => 'required|string|max:100',
+                'latitude' => 'nullable|numeric|between:-90,90',
+                'longitude' => 'nullable|numeric|between:-180,180',
+            ]);
+
+            $lat = $data['latitude'] ?? $user->latitude;
+            $lng = $data['longitude'] ?? $user->longitude;
+
+            $listings = FoodListing::searchAvailableByCity(
+                $data['city'],
+                $lat !== null ? (float) $lat : null,
+                $lng !== null ? (float) $lng : null
+            );
+
+            return $this->searchView($listings, [
+                'search_mode' => 'city',
+                'city' => $data['city'],
+                'latitude' => $lat,
+                'longitude' => $lng,
+                'radius_km' => 10,
+                'listing_cities' => $listingCities,
+                'searched' => true,
+            ]);
+        }
+
         $data = $request->validate([
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'radius_km' => 'nullable|numeric|min:0.1|max:100',
         ]);
 
-        $radiusKm = $data['radius_km'] ?? 5;
+        $radiusKm = (float) ($data['radius_km'] ?? 5);
 
         $listings = FoodListing::searchAvailableNearby(
             (float) $data['latitude'],
             (float) $data['longitude'],
-            (float) $radiusKm
+            $radiusKm
         );
 
-        if ($this->wantsJson($request)) {
-            return response()->json(['listings' => $listings]);
-        }
-
-        return view('recipient.food.index', [
-            'listings' => $listings,
+        return $this->searchView($listings, [
+            'search_mode' => 'nearby',
+            'city' => $request->input('city'),
             'latitude' => $data['latitude'],
             'longitude' => $data['longitude'],
             'radius_km' => $radiusKm,
+            'listing_cities' => $listingCities,
             'searched' => true,
         ]);
+    }
+
+    public function showForRecipient($id)
+    {
+        $listing = FoodListing::with(['donor:id,name,business_name,phone', 'foodCategory'])
+            ->where('status', 'AVAILABLE')
+            ->where('expiry_at', '>', now())
+            ->findOrFail($id);
+
+        return view('recipient.food.show', compact('listing'));
     }
 
     public function markDelivered(Request $request, $id)
     {
         $listing = FoodListing::findOrFail($id);
+        $user = Auth::user();
 
-        if ($listing->donor_id !== Auth::id()) {
+        $isDonor = $listing->donor_id === $user->id;
+        $isClaimer = $user->role === 'recipient'
+            && (int) $listing->claimed_by === (int) $user->id;
+
+        if (! $isDonor && ! $isClaimer) {
             return $this->portalBack(
                 $request,
-                ['message' => 'Only the donor can mark this delivered'],
+                ['message' => 'Only the donor or the recipient who claimed this can mark it delivered'],
                 403,
-                'Only the donor can mark this delivered.'
+                'Only the donor or the recipient who claimed this can mark it delivered.'
             );
         }
 
@@ -142,9 +189,24 @@ class FoodListingController extends Controller
             'delivered_at' => now(),
         ]);
 
+        if ($isDonor && $listing->claimed_by) {
+            PortalNotifier::notifyUser(
+                (int) $listing->claimed_by,
+                'Pickup confirmed: '.$listing->title.' was marked delivered.',
+                $listing->id
+            );
+        } elseif ($isClaimer) {
+            PortalNotifier::notifyUser(
+                (int) $listing->donor_id,
+                'Pickup confirmed: '.$listing->title.' was marked delivered by the recipient.',
+                $listing->id
+            );
+        }
+
+        $defaultBack = $isClaimer ? '/food/claims' : '/food/mine';
         $back = url()->previous();
-        if ($back === url()->current()) {
-            $back = '/food/mine';
+        if ($back === url()->current() || $back === url('/')) {
+            $back = $defaultBack;
         }
 
         return $this->portalRedirect(
@@ -168,6 +230,17 @@ class FoodListingController extends Controller
         }
 
         return view('recipient.claims.index', ['claims' => $listings]);
+    }
+
+    private function searchView($listings, array $extra)
+    {
+        if (request()->expectsJson()) {
+            return response()->json(['listings' => $listings]);
+        }
+
+        return view('recipient.food.index', array_merge($extra, [
+            'listings' => $listings,
+        ]));
     }
 
     private function validateListing(Request $request, ?FoodListing $listing = null): array

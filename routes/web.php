@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClaimController;
 use App\Http\Controllers\FoodListingController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,10 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markRead']);
 
     Route::middleware('role:donor,recipient')->group(function () {
         Route::get('/profile', [ProfileController::class, 'show']);
@@ -40,7 +45,6 @@ Route::middleware(['auth', 'active'])->group(function () {
         });
 
         Route::get('/food/mine', [FoodListingController::class, 'myListings']);
-        Route::post('/food/{id}/deliver', [FoodListingController::class, 'markDelivered']);
     });
 
     Route::middleware('role:recipient')->group(function () {
@@ -49,11 +53,16 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::redirect('/recipient/claims', '/food/claims');
 
         Route::get('/food/search', [FoodListingController::class, 'search']);
+        Route::get('/recipient/food/{id}', [FoodListingController::class, 'showForRecipient']);
         Route::get('/food/claims', [FoodListingController::class, 'myClaims']);
 
         Route::middleware('verified.account')->group(function () {
             Route::post('/food/{id}/claim', [ClaimController::class, 'claim']);
         });
+    });
+
+    Route::middleware('role:donor,recipient')->group(function () {
+        Route::post('/food/{id}/deliver', [FoodListingController::class, 'markDelivered']);
     });
 
     Route::middleware('role:admin')->group(function () {

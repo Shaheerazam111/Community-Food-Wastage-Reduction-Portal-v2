@@ -67,8 +67,18 @@ class PortalController extends Controller
     {
         $user = Auth::user();
 
+        $nearbyFood = collect();
+        if ($user->latitude !== null && $user->longitude !== null) {
+            $nearbyFood = FoodListing::searchAvailableNearby(
+                (float) $user->latitude,
+                (float) $user->longitude,
+                10
+            );
+        }
+
         return view('recipient.dashboard', [
             'user' => $user,
+            'nearbyFood' => $nearbyFood,
             'recentClaims' => FoodListing::where('claimed_by', $user->id)
                 ->latest('claimed_at')
                 ->take(5)
@@ -85,7 +95,10 @@ class PortalController extends Controller
             'listings' => collect(),
             'latitude' => $user->latitude,
             'longitude' => $user->longitude,
-            'radius_km' => 5,
+            'radius_km' => 10,
+            'search_mode' => 'nearby',
+            'city' => $user->city,
+            'listing_cities' => FoodListing::citiesWithAvailableFood(),
             'searched' => false,
         ]);
     }

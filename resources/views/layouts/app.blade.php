@@ -22,6 +22,14 @@
                 <ul class="navbar-nav align-items-lg-center gap-lg-2">
                     @auth
                         <li class="nav-item">
+                            <a class="nav-link nav-notifications position-relative" href="{{ url('/notifications') }}" title="Notifications">
+                                <span class="nav-notifications-label">Alerts</span>
+                                @if (($unreadNotificationCount ?? 0) > 0)
+                                    <span class="nav-notifications-badge">{{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}</span>
+                                @endif
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <span class="navbar-text small text-white-50">{{ auth()->user()->name }} ({{ auth()->user()->role }})</span>
                         </li>
                         <li class="nav-item">

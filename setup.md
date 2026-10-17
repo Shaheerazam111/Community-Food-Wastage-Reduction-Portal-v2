@@ -98,7 +98,10 @@ cp .env.example .env
 composer install
 php artisan key:generate
 php artisan migrate
+php artisan db:seed
 ```
+
+Demo users and sample listings for testing search/claim: [Documentation/Markdown/demo-test-data.md](Documentation/Markdown/demo-test-data.md).
 
 ## Run
 

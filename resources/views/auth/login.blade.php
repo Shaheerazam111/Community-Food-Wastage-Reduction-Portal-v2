@@ -8,7 +8,7 @@
         <div class="card page-card">
             <div class="card-body">
                 <h1 class="page-title h4">Login</h1>
-                <p class="small text-muted">Demo accounts (password: <strong>password</strong>): admin@food.test, donor@food.test, ngo@food.test</p>
+                <p class="small text-muted mb-0">Demo (password: <strong>password</strong>): admin@food.test, donor@food.test, ngo@food.test. After <code>php artisan db:seed</code>, see demo-test-data.md for Karachi listings &amp; pending NGO.</p>
                 <p class="form-hint"><span class="text-danger">*</span> Required fields</p>
                 <form method="POST" action="{{ url('/auth/login') }}">
                     @csrf

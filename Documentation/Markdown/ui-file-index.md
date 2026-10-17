@@ -12,7 +12,11 @@ Layouts, CSS, JS, home, notifications, and shared partials (used across roles).
 
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
-| `portal/resources/views/layouts/app.blade.php` | Logged-in layout: role nav yield, flash alerts, sticky footer | (all role pages) |
+| `resources/views/layouts/app.blade.php` | Logged-in layout: role nav, alerts bell + unread badge, flash alerts | (all role pages) |
+| `resources/views/notifications/index.blade.php` | Dashboard notification list, mark one / mark all read | `/notifications`, POST read routes |
+| `app/Support/PortalNotifier.php` | `notifyUser()` + city-based new listing alerts | (called from food/claim controllers) |
+| `app/Models/PortalNotification.php` | `notifications` table model | — |
+| `portal/resources/views/layouts/app.blade.php` | (legacy path in old docs) | — |
 | `portal/resources/views/layouts/guest.blade.php` | Guest layout with Login / Register nav buttons | `/`, `/login`, `/register` |
 | `portal/public/css/app.css` | Brand colors, nav buttons, home hero, status badges, map embeds, table min-widths | (all pages) |
 | `portal/public/js/app.js` | Confirm dialogs, donation item rows, map pin picker | (all pages; map picker on post/edit) |
@@ -58,8 +62,10 @@ Recipient dashboard, find food, my claims.
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
 | `resources/views/recipient/dashboard.blade.php` | City/org summary + recent claims | `/recipient/dashboard` (auth, recipient) |
-| `resources/views/recipient/food/index.blade.php` | Nearby search form + results | `/recipient/food`, GET `/food/search` |
-| `resources/views/recipient/claims/index.blade.php` | Claim history with pickup details | `/food/claims` |
+| `resources/views/recipient/food/index.blade.php` | GPS / profile / city search + map pins + results table | `/recipient/food`, GET `/food/search` |
+| `resources/views/recipient/food/show.blade.php` | Listing detail, map, claim | `/recipient/food/{id}` |
+| `resources/views/partials/search_results_map.blade.php` | Leaflet pins for search results | (included on find food) |
+| `resources/views/recipient/claims/index.blade.php` | Claim cards: pickup map, donor phone, mark delivered | `/food/claims`, POST `/food/{id}/deliver` |
 | `resources/views/partials/recipient_nav.blade.php` | Recipient navbar links incl. My profile | (included on recipient pages) |
 | `resources/views/profile/show.blade.php` | Update profile + verification document upload | `/profile`, POST `/profile`, POST `/profile/document` |
 

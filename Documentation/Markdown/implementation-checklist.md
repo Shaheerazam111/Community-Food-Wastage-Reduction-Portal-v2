@@ -53,7 +53,7 @@ These come from `Documentation/rules/` plus the project brief. Do not skip them 
 
 ## 1. Where we are now
 
-**Completed checklist steps:** Step 1 (foundation), Step 2 (verification), Step 3 (full donor listing). **Next:** Step 4 (search by city + listing detail).
+**Completed checklist steps:** Steps 1–6. **Next:** Step 7 (feedback and rating).
 
 ### Already working (do not rebuild)
 
@@ -71,15 +71,12 @@ These come from `Documentation/rules/` plus the project brief. Do not skip them 
 ### Still to build (Steps 3–10)
 
 
-| Requirement                                    | Step         |
-| ---------------------------------------------- | ------------ |
-| Search by city, listing detail, map on results | **4** (next) |
-| Recipient mark delivered                       | 5            |
-| Dashboard notifications                        | 6            |
-| Feedback & rating                              | 7            |
-| Impact metrics & admin reports                 | 8            |
-| Admin manage categories (CRUD UI)              | 9            |
-| Polish, install doc, home copy                 | 10           |
+| Requirement                            | Step         |
+| -------------------------------------- | ------------ |
+| Feedback & rating                      | **7** (next) |
+| Impact metrics & admin reports         | 8            |
+| Admin manage categories (CRUD UI)      | 9            |
+| Polish, install doc, home copy         | 10           |
 
 
 ### Docs / cleanup (later)
@@ -185,11 +182,11 @@ Official: *item names, category Veg/Non-Veg, quantity kg or servings, Best Befor
 
 Official: *search by current geographic location **or** city. Interactive map.*
 
-- [ ] **4.1** Recipient **dashboard** is the home after login: nearby available food (from profile pin, default 10 km), then a short list of recent claims.
-- [ ] **4.2** Find food page: (a) use current GPS + radius, (b) use profile pin, (c) **filter by city** (text select from cities that have listings).
-- [ ] **4.3** Still hide claimed, cancelled, and expired food. Sort nearby results closest-first.
-- [ ] **4.4** Listing **detail** page: photo, description, qty/unit, expiry, donor name/phone, pickup address, map embed, Claim button.
-- [ ] **4.5** Optional small map on the search results page (pins for visible listings). List view stays the main view so it works on a phone.
+- [x] **4.1** Recipient **dashboard** is the home after login: nearby available food (from profile pin, default 10 km), then a short list of recent claims.
+- [x] **4.2** Find food page: (a) use current GPS + radius, (b) use profile pin, (c) **filter by city** (text select from cities that have listings).
+- [x] **4.3** Still hide claimed, cancelled, and expired food. Sort nearby results closest-first.
+- [x] **4.4** Listing **detail** page: photo, description, qty/unit, expiry, donor name/phone, pickup address, map embed, Claim button.
+- [x] **4.5** Optional small map on the search results page (pins for visible listings). List view stays the main view so it works on a phone.
 
 **Done when:** an NGO can find food by GPS **and** by city, open a detail page with a map, and claim from there.
 
@@ -201,12 +198,12 @@ Official: *claim reserves the item. Status Available → Claimed → Delivered. 
 
 Keep the existing atomic claim. Do not rewrite it.
 
-- [ ] **5.1** Only verified + active recipients can claim.
-- [ ] **5.2** Claim button on detail page + confirm dialog (JS already supports `data-confirm`).
-- [ ] **5.3** After claim, recipient sees pickup address, map, and donor phone on **My claims**.
-- [ ] **5.4** Recipient can click **Mark as delivered** on a claimed listing (same status change the donor has). Either side may confirm pickup.
-- [ ] **5.5** Donor still sees who claimed it and can also mark delivered.
-- [ ] **5.6** Claimed item never appears in search. Second claim still fails.
+- [x] **5.1** Only verified + active recipients can claim.
+- [x] **5.2** Claim button on detail page + confirm dialog (JS already supports `data-confirm`).
+- [x] **5.3** After claim, recipient sees pickup address, map, and donor phone on **My claims**.
+- [x] **5.4** Recipient can click **Mark as delivered** on a claimed listing (same status change the donor has). Either side may confirm pickup.
+- [x] **5.5** Donor still sees who claimed it and can also mark delivered.
+- [x] **5.6** Claimed item never appears in search. Second claim still fails.
 
 **Done when:** two browsers cannot claim the same listing, and the NGO can mark it delivered after pickup.
 
@@ -218,12 +215,12 @@ Official: *alerts to nearby NGOs when a new donation is posted. Instant dashboar
 
 Keep this small: a `notifications` table + a bell on the navbar. No queues, no email.
 
-- [ ] **6.1** Table `notifications` (`user_id`, `food_listing_id` nullable, `message`, `is_read`, timestamps).
-- [ ] **6.2** When a donor posts food, create one notification for each **verified recipient in the same city** (simple and fast). If no city match, skip rather than scanning the whole country.
-- [ ] **6.3** When someone claims food, notify the donor: “{NGO} claimed {title}.”
-- [ ] **6.4** When status becomes delivered, notify the other party.
-- [ ] **6.5** Navbar: unread count. `/notifications` list. Mark as read (one or all).
-- [ ] **6.6** Write a small helper, e.g. `notifyUser($userId, $message, $listingId)`, and call it from the existing controllers. Do not build an event/listener stack.
+- [x] **6.1** Table `notifications` (`user_id`, `food_listing_id` nullable, `message`, `is_read`, timestamps).
+- [x] **6.2** When a donor posts food, create one notification for each **verified recipient in the same city** (simple and fast). If no city match, skip rather than scanning the whole country.
+- [x] **6.3** When someone claims food, notify the donor: “{NGO} claimed {title}.”
+- [x] **6.4** When status becomes delivered, notify the other party.
+- [x] **6.5** Navbar: unread count. `/notifications` list. Mark as read (one or all).
+- [x] **6.6** Write a small helper, e.g. `notifyUser($userId, $message, $listingId)`, and call it from the existing controllers. Do not build an event/listener stack.
 
 **Done when:** posting food in Lahore shows a dashboard alert for the Lahore NGO; claiming and delivering also create alerts.
 
