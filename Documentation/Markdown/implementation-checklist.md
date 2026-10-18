@@ -53,7 +53,7 @@ These come from `Documentation/rules/` plus the project brief. Do not skip them 
 
 ## 1. Where we are now
 
-**Completed checklist steps:** Steps 1–9. **Next:** Step 10 (polish).
+**Completed checklist steps:** Steps 1–10.
 
 ### Already working (do not rebuild)
 
@@ -68,18 +68,9 @@ These come from `Documentation/rules/` plus the project brief. Do not skip them 
 | UI             | Donor/recipient/admin dashboards, find food, my claims, Bootstrap 5 + Leaflet.                                                                                                |
 
 
-### Still to build (Steps 3–10)
+### Still to build
 
-
-| Requirement                            | Step         |
-| -------------------------------------- | ------------ |
-| Polish, install doc, home copy         | **10** (next) |
-
-
-### Docs / cleanup (later)
-
-- `how-to-install-and-run.md` still mentions old `portal/` + dummy data — update in Step 10.
-- Home page still mentions assignment API tasks — rewrite in Step 10.
+All numbered build steps (1–10) are complete. Future work is only if the supervisor asks for extras outside `project-requirements.md`.
 
 ---
 
@@ -271,15 +262,15 @@ Official: *admin manages food categories.*
 
 Not extra features. These stop the app from looking unfinished.
 
-- [ ] **10.1** Validation errors show under fields (`@error`). Flash success/error already exists.
-- [ ] **10.2** Empty states: “No food nearby yet”, “No listings posted”, “No claims yet”.
-- [ ] **10.3** Expired food: keep lazy filter in search/claim; hourly `food:expire` stays.
-- [ ] **10.4** Navbar per role only shows that role’s links + Notifications + Logout.
-- [ ] **10.5** Rewrite home page copy for real users (how it works), not assignment task numbers.
-- [ ] **10.6** Update `ui-file-index.md` to match real files/routes (no `portal/` prefix, no DemoData).
-- [ ] **10.7** Update `how-to-install-and-run.md`: real MySQL, `php artisan migrate --seed`, demo logins, no dummy-data note.
-- [ ] **10.8** Check main flows on desktop and a phone-width screen.
-- [ ] **10.9** Confirm: register → verify → post → notify → search → claim → deliver → rate → admin report.
+- [x] **10.1** Validation errors show under fields (`@error`). Flash success/error already exists.
+- [x] **10.2** Empty states: “No food nearby yet”, “No listings posted”, “No claims yet”.
+- [x] **10.3** Expired food: keep lazy filter in search/claim; hourly `food:expire` stays.
+- [x] **10.4** Navbar per role only shows that role’s links + Notifications + Logout.
+- [x] **10.5** Rewrite home page copy for real users (how it works), not assignment task numbers.
+- [x] **10.6** Update `ui-file-index.md` to match real files/routes (no `portal/` prefix, no DemoData).
+- [x] **10.7** Update `how-to-install-and-run.md`: real MySQL, `php artisan migrate --seed`, demo logins, no dummy-data note.
+- [x] **10.8** Check main flows on desktop and a phone-width screen.
+- [x] **10.9** Confirm: register → verify → post → notify → search → claim → deliver → rate → admin report.
 
 **Done when:** a new person can run the app from the install doc and complete a full donation without using Postman.
 

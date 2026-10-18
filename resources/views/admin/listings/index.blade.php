@@ -14,9 +14,10 @@
 
 <p class="small text-muted mb-3">Read-only view. Filter by status or city.</p>
 
-<div class="card page-card mb-4">
-    <div class="card-body">
-        <form method="GET" action="{{ url('/admin/listings') }}" class="row g-3 align-items-end">
+<details class="ui-disclose mb-4" @if (! empty($filters['status']) || ! empty($filters['city'])) open @endif>
+    <summary>Filter listings</summary>
+    <div class="ui-disclose-body">
+        <form method="GET" action="{{ url('/admin/listings') }}" class="row g-3 align-items-end mt-3">
             <div class="col-12 col-md-4">
                 <label for="status" class="form-label">Status</label>
                 <select class="form-select" id="status" name="status">
@@ -41,7 +42,7 @@
             </div>
         </form>
     </div>
-</div>
+</details>
 
 <div class="card page-card">
     <div class="card-body p-0">

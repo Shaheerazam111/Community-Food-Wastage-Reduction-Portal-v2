@@ -17,10 +17,10 @@
     Categories with listings are not deleted — deactivate them instead.
 </p>
 
-<div class="card page-card mb-4">
-    <div class="card-header"><strong>Add category</strong></div>
-    <div class="card-body">
-        <form method="POST" action="{{ url('/admin/categories') }}" class="row g-3 align-items-end">
+<details class="ui-disclose mb-4" @if ($errors->has('name')) open @endif>
+    <summary>Add a category</summary>
+    <div class="ui-disclose-body">
+        <form method="POST" action="{{ url('/admin/categories') }}" class="row g-3 align-items-end mt-3">
             @csrf
             <div class="col-12 col-md-8">
                 <label for="name" class="form-label required">Name</label>
@@ -32,7 +32,7 @@
             </div>
         </form>
     </div>
-</div>
+</details>
 
 <div class="card page-card">
     <div class="card-body p-0">

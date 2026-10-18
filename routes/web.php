@@ -14,10 +14,12 @@ use App\Http\Controllers\PortalController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// --- Public HTML pages ---
-Route::get('/', [HomeController::class, 'index']);
-Route::get('/login', [PortalController::class, 'showLogin'])->name('login');
-Route::get('/register', [PortalController::class, 'showRegister'])->name('register');
+// --- Public HTML pages (logged-in users go to their dashboard) ---
+Route::middleware('guest')->group(function () {
+    Route::get('/', [HomeController::class, 'index']);
+    Route::get('/login', [PortalController::class, 'showLogin'])->name('login');
+    Route::get('/register', [PortalController::class, 'showRegister'])->name('register');
+});
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);

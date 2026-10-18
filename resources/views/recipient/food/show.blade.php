@@ -45,12 +45,16 @@
         </div>
     </div>
     <div class="col-12">
-        <h2 class="h6">Pickup location</h2>
-        @include('partials.map_embed', [
-            'latitude' => $listing->latitude,
-            'longitude' => $listing->longitude,
-            'label' => 'Pickup map',
-        ])
+        <details class="ui-disclose" open>
+            <summary>Pickup map</summary>
+            <div class="ui-disclose-body pt-3">
+                @include('partials.map_embed', [
+                    'latitude' => $listing->latitude,
+                    'longitude' => $listing->longitude,
+                    'label' => 'Pickup map',
+                ])
+            </div>
+        </details>
     </div>
     <div class="col-12">
         @if (auth()->user()->is_verified && auth()->user()->is_active)

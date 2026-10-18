@@ -114,12 +114,16 @@
                     </div>
 
                     <div class="col-12 col-lg-7">
-                        <h3 class="claim-block-label">Pickup map</h3>
-                        @include('partials.map_embed', [
-                            'latitude' => $claim->latitude,
-                            'longitude' => $claim->longitude,
-                            'label' => 'Pickup map for '.$claim->title,
-                        ])
+                        <details class="ui-disclose">
+                            <summary>Show pickup map</summary>
+                            <div class="ui-disclose-body pt-3">
+                                @include('partials.map_embed', [
+                                    'latitude' => $claim->latitude,
+                                    'longitude' => $claim->longitude,
+                                    'label' => 'Pickup map for '.$claim->title,
+                                ])
+                            </div>
+                        </details>
                     </div>
                 </div>
 

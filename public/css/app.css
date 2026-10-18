@@ -509,6 +509,47 @@ body {
     max-width: 28rem;
 }
 
+/* Collapsed panels: summary first, form only after the user opens it */
+.ui-disclose {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0.375rem;
+    background: #fff;
+}
+
+.ui-disclose > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--brand-dark);
+}
+
+.ui-disclose > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ui-disclose > summary::after {
+    content: "Show";
+    float: right;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--brand);
+}
+
+.ui-disclose[open] > summary::after {
+    content: "Hide";
+}
+
+.ui-disclose > summary:hover {
+    background: var(--brand-soft);
+}
+
+.ui-disclose-body {
+    padding: 0 1rem 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
 /* Dispute cards */
 .dispute-card {
     border: 1px solid rgba(0, 0, 0, 0.08);

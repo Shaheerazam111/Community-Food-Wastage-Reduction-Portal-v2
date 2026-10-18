@@ -18,20 +18,7 @@
             <input type="hidden" id="latitude" name="latitude" value="{{ $latitude }}">
             <input type="hidden" id="longitude" name="longitude" value="{{ $longitude }}">
 
-            <div class="col-12 col-md-4">
-                <label for="radius_km" class="form-label">Radius (km) — nearby search</label>
-                <input type="number" step="0.1" min="0.1" max="100" class="form-control" id="radius_km" name="radius_km" value="{{ $radius_km ?? 10 }}">
-            </div>
-            <div class="col-12 col-md-4">
-                <label for="city" class="form-label">Filter by city</label>
-                <select class="form-select" id="city" name="city">
-                    <option value="">Choose a city</option>
-                    @foreach ($listing_cities ?? [] as $cityName)
-                        <option value="{{ $cityName }}" @selected(($city ?? '') === $cityName)>{{ $cityName }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-12 col-md-4 d-flex flex-wrap gap-2">
+            <div class="col-12 d-flex flex-wrap gap-2">
                 <button type="button" class="btn btn-brand" id="btn-current-location">Use GPS &amp; search</button>
                 @if ($latitude !== null && $longitude !== null)
                     <button type="button" class="btn btn-outline-secondary" id="btn-profile-location">Use profile pin</button>
@@ -39,6 +26,29 @@
                 <button type="button" class="btn btn-outline-secondary" id="btn-city-search">Search by city</button>
             </div>
         </form>
+
+        <details class="ui-disclose mt-3" id="search-options" @if (! empty($searched)) open @endif>
+            <summary>Search options</summary>
+            <div class="ui-disclose-body">
+                <div class="row g-3 mt-1">
+                    <div class="col-12 col-md-6">
+                        <label for="radius_km" class="form-label">Radius (km)</label>
+                        <input type="number" step="0.1" min="0.1" max="100" class="form-control" id="radius_km" name="radius_km" form="food-search-form" value="{{ $radius_km ?? 10 }}">
+                        <p class="form-text mb-0">Used with GPS or your profile pin. Default is 10 km.</p>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="city" class="form-label">City</label>
+                        <select class="form-select" id="city" name="city" form="food-search-form">
+                            <option value="">Choose a city</option>
+                            @foreach ($listing_cities ?? [] as $cityName)
+                                <option value="{{ $cityName }}" @selected(($city ?? '') === $cityName)>{{ $cityName }}</option>
+                            @endforeach
+                        </select>
+                        <p class="form-text mb-0">Then press Search by city.</p>
+                    </div>
+                </div>
+            </div>
+        </details>
 
         <p class="small text-muted mt-3 mb-0" id="location-status">
             @if (! empty($searched))
@@ -52,9 +62,10 @@
             @endif
         </p>
 
-        <details class="mt-3">
-            <summary class="small text-muted">Advanced: enter latitude / longitude manually</summary>
-            <div class="row g-3 mt-2">
+        <details class="ui-disclose mt-3">
+            <summary>Enter coordinates yourself</summary>
+            <div class="ui-disclose-body">
+            <div class="row g-3 mt-1">
                 <div class="col-12 col-md-4">
                     <label for="latitude_manual" class="form-label">Latitude</label>
                     <input type="number" step="any" class="form-control" id="latitude_manual" value="{{ $latitude }}">
@@ -67,15 +78,17 @@
                     <button type="button" class="btn btn-outline-secondary w-100" id="btn-manual-search">Search nearby with these coordinates</button>
                 </div>
             </div>
+            </div>
         </details>
     </div>
 </div>
 
 @if (empty($searched))
-    <div class="alert alert-info">Use <strong>Use GPS &amp; search</strong>, your profile pin, or <strong>Search by city</strong>.</div>
+    <div class="alert alert-info">Use <strong>Use GPS &amp; search</strong>, your profile pin, or <strong>Search by city</strong>. Radius and city are under Search options.</div>
 @endif
 
-@if (! empty($searched) && count($listings))
+@if (! empty($searched))
+@if (count($listings))
     <div class="card page-card mb-3">
         <div class="card-header"><strong>Map view</strong></div>
         <div class="card-body">
@@ -135,10 +148,10 @@
                     @empty
                         <tr>
                             <td colspan="8" class="text-muted p-3">
-                                @if (! empty($searched))
-                                    No available food matched this search.
+                                @if (($search_mode ?? 'nearby') === 'city')
+                                    No available food in this city right now.
                                 @else
-                                    Run a search to see results.
+                                    No food nearby yet. Try a wider radius or search by city.
                                 @endif
                             </td>
                         </tr>
@@ -148,6 +161,7 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
 
 @push('styles')
@@ -215,7 +229,11 @@
     if (btnCity) {
         btnCity.addEventListener('click', function () {
             if (!citySelect.value) {
-                alert('Choose a city first.');
+                var options = document.getElementById('search-options');
+                if (options) {
+                    options.open = true;
+                }
+                alert('Open Search options and choose a city first.');
                 return;
             }
             modeInput.value = 'city';

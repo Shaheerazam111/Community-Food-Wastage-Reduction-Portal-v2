@@ -63,5 +63,16 @@ document.querySelectorAll('[data-confirm]').forEach(function (el) {
         setTimeout(function () {
             map.invalidateSize();
         }, 100);
+
+        var panel = box.closest('details');
+        if (panel) {
+            panel.addEventListener('toggle', function () {
+                if (panel.open) {
+                    setTimeout(function () {
+                        map.invalidateSize();
+                    }, 50);
+                }
+            });
+        }
     });
 })();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\HandlesPortalResponses;
 use App\Models\User;
+use App\Support\RoleDashboard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -43,7 +44,7 @@ class AuthController extends Controller
             $request,
             ['user' => $user],
             201,
-            $this->homeForRole($user->role),
+            RoleDashboard::path($user->role),
             'Account created. You are logged in. An admin will verify your account before you can post or claim food.'
         );
     }
@@ -85,7 +86,7 @@ class AuthController extends Controller
             $request,
             ['user' => $user],
             200,
-            $this->homeForRole($user->role),
+            RoleDashboard::path($user->role),
             'Welcome back, '.$user->name.'.'
         );
     }
@@ -105,12 +106,4 @@ class AuthController extends Controller
         );
     }
 
-    private function homeForRole(string $role): string
-    {
-        return match ($role) {
-            'donor' => '/donor/dashboard',
-            'admin' => '/admin/dashboard',
-            default => '/recipient/dashboard',
-        };
-    }
 }

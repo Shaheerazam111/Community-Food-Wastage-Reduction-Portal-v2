@@ -11,7 +11,7 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-brand">
         <div class="container">
-            <a class="navbar-brand fw-semibold" href="{{ url('/') }}">Food Portal</a>
+            <a class="navbar-brand fw-semibold" href="{{ \App\Support\RoleDashboard::urlFor(auth()->user()) }}">Food Portal</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>

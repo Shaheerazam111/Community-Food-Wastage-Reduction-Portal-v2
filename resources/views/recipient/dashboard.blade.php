@@ -72,7 +72,7 @@
                                 @if ($user->latitude === null || $user->longitude === null)
                                     Set your map pin on <a href="{{ url('/profile') }}">My profile</a> to see nearby food.
                                 @else
-                                    No available food within 10 km right now.
+                                    No food nearby yet. Try Find food with a wider radius or another city.
                                 @endif
                             </td>
                         </tr>

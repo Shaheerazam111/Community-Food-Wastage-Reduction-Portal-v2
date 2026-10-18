@@ -100,7 +100,7 @@
                             $cols += 1;
                         }
                     @endphp
-                    <td colspan="{{ $cols }}" class="text-muted p-3">No listings yet.</td>
+                    <td colspan="{{ $cols }}" class="text-muted p-3">No listings posted yet.</td>
                 </tr>
             @endforelse
         </tbody>

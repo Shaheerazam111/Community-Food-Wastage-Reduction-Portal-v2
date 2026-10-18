@@ -51,18 +51,14 @@
                                 @endif
                             </td>
                             <td>
-                                <div class="d-flex flex-column gap-2">
-                                    <form method="POST" action="{{ url('/admin/users/'.$user->id) }}" class="d-flex flex-wrap gap-1 align-items-start">
-                                        @csrf
-                                        <input type="hidden" name="action" value="approve">
-                                        <button type="submit" class="btn btn-sm btn-brand">Approve</button>
-                                    </form>
-                                    <form method="POST" action="{{ url('/admin/users/'.$user->id) }}" class="d-flex flex-wrap gap-1">
-                                        @csrf
-                                        <input type="hidden" name="action" value="reject">
-                                        <input type="text" name="admin_note" class="form-control form-control-sm" placeholder="Reject note (optional)" style="min-width: 140px;">
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Reject</button>
-                                    </form>
+                                <div class="d-flex flex-wrap gap-1 mb-2">
+                                    @if (! $user->is_verified)
+                                        <form method="POST" action="{{ url('/admin/users/'.$user->id) }}">
+                                            @csrf
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn btn-sm btn-brand">Approve</button>
+                                        </form>
+                                    @endif
                                     @if ($user->is_active)
                                         <form method="POST" action="{{ url('/admin/users/'.$user->id) }}">
                                             @csrf
@@ -77,6 +73,18 @@
                                         </form>
                                     @endif
                                 </div>
+                                <details class="ui-disclose">
+                                    <summary>Reject with a note</summary>
+                                    <div class="ui-disclose-body">
+                                        <form method="POST" action="{{ url('/admin/users/'.$user->id) }}" class="mt-3">
+                                            @csrf
+                                            <input type="hidden" name="action" value="reject">
+                                            <label class="form-label" for="note-{{ $user->id }}">Note (optional)</label>
+                                            <input type="text" id="note-{{ $user->id }}" name="admin_note" class="form-control form-control-sm mb-2" placeholder="Why this was rejected">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">Reject</button>
+                                        </form>
+                                    </div>
+                                </details>
                             </td>
                         </tr>
                     @empty
