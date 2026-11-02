@@ -88,6 +88,10 @@ class AuthController extends Controller
 
     private function homeForRole(string $role): string
     {
+        if ($role === 'admin') {
+            return '/admin/dashboard';
+        }
+
         if ($role === 'donor') {
             return '/donor/dashboard';
         }

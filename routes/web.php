@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminReportController;
 use App\Http\Controllers\ApiTestController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClaimController;
@@ -33,6 +35,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/food/claims', [FoodListingController::class, 'myClaims']);
     Route::post('/food/{id}/deliver', [FoodListingController::class, 'markDelivered']);
     Route::post('/food/{id}/claim', [ClaimController::class, 'claim']);
+});
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index']);
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('admin.reports');
+    Route::get('/reports/export', [AdminReportController::class, 'exportCsv'])->name('admin.reports.export');
 });
 
 // --- API tester (browser JSON client) ---

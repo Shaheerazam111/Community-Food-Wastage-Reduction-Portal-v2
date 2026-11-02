@@ -75,15 +75,17 @@ Volunteer task list and task detail with route maps.
 
 ## Admin
 
-Admin dashboard, users (view doc), moderate listings (reject reason), disputes, reports.
+Admin dashboard and live MySQL reports (v2). User moderation / disputes not built yet.
 
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
-| `portal/resources/views/admin/dashboard.blade.php` | Summary counts + quick action buttons | `/admin/dashboard` |
-| `portal/resources/views/admin/users/index.blade.php` | User list; View document modal stub; Approve / Block | `/admin/users`, POST `/admin/users/{id}` |
-| `portal/resources/views/admin/donations/index.blade.php` | Moderate listings + reject reason; recent feedback list | `/admin/donations`, POST `/admin/donations/{id}` |
-| `portal/resources/views/admin/disputes/index.blade.php` | Dispute cards: status select + admin note + Update | `/admin/disputes`, POST `/admin/disputes/{id}` |
-| `portal/resources/views/admin/reports/index.blade.php` | Totals, by-status table, city filter + by-city table | `/admin/reports` |
+| `resources/views/admin/dashboard.blade.php` | Last 30 days KPIs + status bars | `/admin/dashboard` |
+| `resources/views/admin/reports/index.blade.php` | Date filter, trends, top donors/NGOs, areas, CSV export | `/admin/reports`, `/admin/reports/export` |
+| `resources/views/partials/admin_nav.blade.php` | Admin navbar links | (included by admin pages) |
+| `app/Http/Controllers/AdminDashboardController.php` | Dashboard data | `/admin/dashboard` |
+| `app/Http/Controllers/AdminReportController.php` | Reports + CSV | `/admin/reports`, `/admin/reports/export` |
+| `app/Services/AdminReportService.php` | Report SQL aggregations | (used by admin controllers) |
+| `app/Http/Middleware/EnsureUserIsAdmin.php` | Blocks non-admin users | `admin` middleware |
 
 ---
 
