@@ -20,13 +20,13 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'role' => ['required', Rule::in(['donor', 'recipient'])],
-            'business_name' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:30',
-            'ngo_name' => 'nullable|string|max:255',
-            'contact_person' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'business_name' => 'required_if:role,donor|nullable|string|max:255',
+            'phone' => 'required_if:role,donor|nullable|string|max:30',
+            'ngo_name' => 'required_if:role,recipient|nullable|string|max:255',
+            'contact_person' => 'required_if:role,recipient|nullable|string|max:255',
+            'address' => 'required|string|max:255',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
         ]);
 
         $data['password'] = Hash::make($data['password']);

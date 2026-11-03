@@ -1,0 +1,35 @@
+sequenceDiagram
+    autonumber
+    actor User as User (Donor / NGO / Admin)
+    participant Browser
+    participant Auth as AuthController
+    participant DB as MySQL users
+    participant Session as Session store
+
+    rect rgb(240, 248, 255)
+        Note over User,Session: Register (donor or recipient only)
+        User->>Browser: Submit register form
+        Browser->>Auth: POST /auth/register
+        Auth->>Auth: Validate fields + role
+        Auth->>DB: INSERT user (password hashed)
+        Auth->>Session: Auth login + session id
+        Auth-->>Browser: Redirect home or JSON 201
+    end
+
+    rect rgb(255, 248, 240)
+        Note over User,Session: Login
+        User->>Browser: Submit login
+        Browser->>Auth: POST /auth/login
+        Auth->>DB: SELECT by email
+        Auth->>Auth: Verify password
+        Auth->>Session: Regenerate session
+        Auth-->>Browser: Redirect by role or JSON 200
+    end
+
+    rect rgb(245, 245, 245)
+        Note over User,Session: Logout
+        User->>Browser: Logout
+        Browser->>Auth: POST /auth/logout
+        Auth->>Session: Invalidate session
+        Auth-->>Browser: Redirect / or JSON
+    end

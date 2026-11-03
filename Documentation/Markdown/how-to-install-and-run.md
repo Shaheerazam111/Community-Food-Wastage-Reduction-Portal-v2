@@ -1,24 +1,17 @@
 # How to Install and Run
 
-Simple steps to get the **Community Food Wastage Reduction Portal** running on your machine.
-
-Right now the screens use **dummy data** (`DemoData`), so you can open every page without a working MySQL database. MySQL is still listed below for when we wire up real tables later.
+Steps for the **Community Food Wastage Reduction Portal v2** (Laravel app at the **repo root**).
 
 ---
 
 ## What you need
 
-| Tool | Version (approx.) | Why |
-| ---- | ----------------- | --- |
-| PHP | 8.0+ | Laravel app |
-| Composer | 2.x | PHP packages |
-| MySQL | 8.x (optional for UI demo) | Database later |
-| Git | any recent | Clone the repo |
-| Browser | Chrome / Edge / Firefox | View the site |
-
-**Optional:** XAMPP / Laragon / WAMP already give you PHP + MySQL on Windows.
-
-Check versions:
+| Tool | Version (approx.) |
+| ---- | ------------------- |
+| PHP | 8.0+ |
+| Composer | 2.x |
+| MySQL | 8.x |
+| Browser | Chrome / Edge / Firefox |
 
 ```bash
 php -v
@@ -27,178 +20,113 @@ composer -V
 
 ---
 
-## 1. Get the project
+## 1. Clone and install
 
 ```bash
-git clone <your-repo-url> ashir
-cd ashir
-```
-
-If you already have the folder, just open a terminal in `ashir`.
-
----
-
-## 2. Install PHP packages
-
-The Laravel app lives in `portal/`.
-
-```bash
-cd portal
+git clone <your-repo-url> Community-Food-Wastage-Reduction-Portal-v2
+cd Community-Food-Wastage-Reduction-Portal-v2
 composer install
 ```
 
-If `vendor/` is already there and you did not change `composer.json`, you can skip this.
-
 ---
 
-## 3. Environment file
-
-```bash
-# From portal/
-cp .env.example .env
-```
-
-On Windows (Git Bash / PowerShell):
+## 2. Environment
 
 ```bash
 cp .env.example .env
-```
-
-Generate the app key (needed once):
-
-```bash
 php artisan key:generate
 ```
 
-### Database settings (optional for UI demo)
-
-Open `portal/.env` and set MySQL if you use it:
+Edit `.env`:
 
 ```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=food_portal
+DB_DATABASE=cfwrp_v2
 DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-Create the empty database in MySQL (phpMyAdmin or CLI):
+Create the database:
 
 ```sql
-CREATE DATABASE food_portal;
+CREATE DATABASE cfwrp_v2;
 ```
-
-Then run migrations (only when you start using real tables):
-
-```bash
-php artisan migrate
-```
-
-> **UI demo note:** Browse / claim / admin screens read from `app/Support/DemoData.php`, not from MySQL. You can run the site even if DB is not set up yet.
 
 ---
 
-## 4. Start the server
+## 3. Database
 
-From `portal/`:
+```bash
+php artisan migrate
+php artisan db:seed --class=AdminUserSeeder
+```
+
+Default admin (change in production): `admin@foodportal.test` / `admin123`
+
+Optional: set `SEED_ADMIN=true` before `php artisan db:seed` if you extend `DatabaseSeeder`.
+
+---
+
+## 4. Run locally
 
 ```bash
 php artisan serve
 ```
 
-Open in the browser:
+Open **http://127.0.0.1:8000**
 
-**http://127.0.0.1:8000**
+Optional expiry job (manual):
 
-Stop the server with `Ctrl + C` in that terminal.
+```bash
+php artisan food:expire
+```
+
+For scheduled expiry in dev: `php artisan schedule:work`
 
 ---
 
-## 5. Try the demo UI
+## 5. Try the app
 
-1. Go to **http://127.0.0.1:8000**
-2. Click **Login**
-3. Use a **demo button** (no real password):
-   - Continue as Donor
-   - Continue as NGO
-   - Continue as Volunteer
-   - Continue as Admin
-   - Pending NGO (shows “account not active yet”)
+1. **Register** a donor — business name, phone, address, **map pin** (required).  
+2. **Post food** from donor dashboard.  
+3. **Register** an NGO (new browser or logout) with map pin.  
+4. **Search** and **claim** food.  
+5. Donor **Mark delivered** on my listings.  
+6. Admin → `/admin/dashboard` (after seeder).
 
-Useful paths after login:
+Full demo: [demo-and-viva-script.md](demo-and-viva-script.md)
 
-| Role | Start here |
-| ---- | ---------- |
-| Donor | `/donor/dashboard` — post donation, map pin, my donations |
-| NGO | `/receiver/dashboard` — browse food (list / map), claims |
-| Volunteer | `/volunteer/tasks` — task detail + route maps |
-| Admin | `/admin/dashboard` — users, moderate, disputes, reports |
+API playground: **http://127.0.0.1:8000/test-apis**  
+Postman: `Documentation/postman_collection.json`
 
-More screen → file mapping: [ui-file-index.md](ui-file-index.md)
+---
+
+## Production
+
+See [production-deploy.md](production-deploy.md).
 
 ---
 
 ## Common problems
 
-### “No application encryption key”
-
-```bash
-cd portal
-php artisan key:generate
-```
-
-### Port 8000 already in use
-
-```bash
-php artisan serve --port=8080
-```
-
-Then open **http://127.0.0.1:8080**
-
-### `composer install` fails
-
-- Make sure PHP 8.0+ is installed and on your PATH.
-- On Windows, restart the terminal after installing PHP / Composer.
-
-### Blank page or CSS missing
-
-- Confirm you started the server from `portal/` (not the repo root).
-- Hard refresh the browser (`Ctrl + F5`).
-
-### Map does not load
-
-- Post / Edit donation needs internet for OpenStreetMap tiles (Leaflet CDN).
-- Check your network / firewall if the map area stays grey.
+| Issue | Fix |
+| ----- | --- |
+| No application key | `php artisan key:generate` |
+| Donor cannot post | Register with map pin (lat/lng required) |
+| Admin login fails | `php artisan db:seed --class=AdminUserSeeder` |
+| Port 8000 in use | `php artisan serve --port=8080` |
 
 ---
 
-## Project layout (short)
+## Project layout
 
 ```
-ashir/
-├── docs/                  # Design docs, diagrams, this guide
-│   └── Markdown/
-└── portal/                # Laravel + Blade UI
-    ├── app/
-    ├── public/            # css, js
-    ├── resources/views/   # Blade screens
-    ├── routes/web.php
-    └── .env
+Community-Food-Wastage-Reduction-Portal-v2/
+├── app/                 # Controllers, models, services
+├── public/              # CSS, JS, index.php
+├── resources/views/     # Blade UI
+├── routes/web.php       # Routes + API
+├── Documentation/       # SRS, diagrams, checklists
+└── .env
 ```
 
-Stack: **Laravel + Blade + Bootstrap 5 + plain CSS/JS + MySQL** (MySQL when backend is connected).
-
----
-
-## Commands cheat sheet
-
-```bash
-cd portal
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan serve
-```
-
-That is enough to run the current UI demo.
+Stack: **Laravel + Blade + Bootstrap 5 + MySQL**.

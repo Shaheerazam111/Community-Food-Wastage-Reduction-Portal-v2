@@ -23,9 +23,11 @@ Route::redirect('/donor/donations', '/food/mine');
 Route::redirect('/recipient/claims', '/food/claims');
 
 // --- API (JSON + HTML forms use the same URLs) ---
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/logout', [AuthController::class, 'logout']);
+Route::middleware('throttle:20,1')->group(function () {
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/login', [AuthController::class, 'login']);
+});
+Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth');
 
 Route::get('/food/search', [FoodListingController::class, 'search']);
 
@@ -34,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/food/mine', [FoodListingController::class, 'myListings']);
     Route::get('/food/claims', [FoodListingController::class, 'myClaims']);
     Route::post('/food/{id}/deliver', [FoodListingController::class, 'markDelivered']);
+    Route::post('/food/{id}/cancel', [FoodListingController::class, 'cancel']);
     Route::post('/food/{id}/claim', [ClaimController::class, 'claim']);
 });
 

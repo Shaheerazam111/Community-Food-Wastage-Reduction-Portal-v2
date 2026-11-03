@@ -1,0 +1,35 @@
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant Browser
+    participant MW as EnsureUserIsAdmin
+    participant Dash as AdminDashboardController
+    participant Rep as AdminReportController
+    participant Svc as AdminReportService
+    participant DB as MySQL
+
+    Admin->>Browser: Open /admin/dashboard or /admin/reports
+    Browser->>MW: GET (session)
+    alt not admin
+        MW-->>Browser: Redirect login + error
+    else admin ok
+        MW->>Dash: dashboard (last 30 days)
+        Dash->>Svc: build(from, to)
+        Svc->>DB: COUNT/GROUP BY queries
+        DB-->>Svc: Aggregates
+        Svc-->>Dash: summary + byStatus
+        Dash-->>Browser: HTML dashboard
+
+        Admin->>Browser: Set date range + submit
+        Browser->>Rep: GET /admin/reports?from&to
+        Rep->>Svc: resolveDateRange + build
+        Svc->>DB: trend, top donors, areas, etc.
+        DB-->>Svc: Result sets
+        Svc-->>Rep: Report payload
+        Rep-->>Browser: Reports page
+
+        Admin->>Browser: Download CSV
+        Browser->>Rep: GET /admin/reports/export
+        Rep->>Svc: build(same range)
+        Rep-->>Browser: Stream CSV file
+    end

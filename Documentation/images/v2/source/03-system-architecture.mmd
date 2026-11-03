@@ -1,0 +1,49 @@
+flowchart TB
+    subgraph Client["Presentation tier"]
+        Browser["Web browser"]
+        Blade["Blade templates"]
+        Assets["CSS / JS / Bootstrap"]
+        Tester["/test-apis client"]
+    end
+
+    subgraph App["Application tier — Laravel"]
+        WebServer["PHP web server"]
+        Routes["routes/web.php"]
+        MW["Middleware\nauth, admin, CSRF"]
+        Ctrl["Controllers"]
+        AuthC["AuthController"]
+        FoodC["FoodListingController"]
+        ClaimC["ClaimController"]
+        AdminC["AdminReportService\n+ Admin controllers"]
+        PortalC["PortalController"]
+        Dual["HandlesPortalResponses\nJSON or redirect"]
+        Sched["Scheduler\nfood:expire hourly"]
+    end
+
+    subgraph Data["Data tier"]
+        DB[("MySQL")]
+        TUsers["users"]
+        TList["food_listings"]
+    end
+
+    Browser --> Blade
+    Browser --> Tester
+    Blade --> Assets
+    Browser -->|"HTTP"| WebServer
+    WebServer --> Routes --> MW --> Ctrl
+    Ctrl --> AuthC
+    Ctrl --> FoodC
+    Ctrl --> ClaimC
+    Ctrl --> AdminC
+    Ctrl --> PortalC
+    AuthC --> Dual
+    FoodC --> Dual
+    ClaimC --> Dual
+    AuthC --> DB
+    FoodC --> DB
+    ClaimC --> DB
+    AdminC --> DB
+    PortalC --> DB
+    DB --- TUsers
+    DB --- TList
+    Sched -->|"UPDATE status EXPIRED"| DB

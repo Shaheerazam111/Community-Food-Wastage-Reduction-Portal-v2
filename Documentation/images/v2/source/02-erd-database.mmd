@@ -1,0 +1,38 @@
+erDiagram
+    USERS ||--o{ FOOD_LISTINGS : "donor_id posts"
+    USERS ||--o{ FOOD_LISTINGS : "claimed_by claims"
+
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        string password
+        enum role "donor|recipient|admin"
+        string business_name
+        string phone
+        string ngo_name
+        string contact_person
+        string address
+        decimal latitude
+        decimal longitude
+        datetime created_at
+        datetime updated_at
+    }
+
+    FOOD_LISTINGS {
+        bigint id PK
+        bigint donor_id FK
+        string title
+        enum category "veg|non_veg"
+        string quantity
+        string pickup_address
+        decimal latitude
+        decimal longitude
+        datetime expiry_at
+        enum status "AVAILABLE|CLAIMED|DELIVERED|EXPIRED"
+        bigint claimed_by FK
+        datetime claimed_at
+        datetime delivered_at
+        datetime created_at
+        datetime updated_at
+    }

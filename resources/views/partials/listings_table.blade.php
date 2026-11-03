@@ -55,11 +55,16 @@
                         </td>
                     @endif
                     @if (! empty($showDeliverButton))
-                        <td>
+                        <td class="col-actions">
                             @if ($status === 'CLAIMED')
                                 <form method="POST" action="{{ url('/food/'.$listing->id.'/deliver') }}" class="d-inline">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-brand" data-confirm="Mark this listing as DELIVERED?">Mark delivered</button>
+                                </form>
+                            @elseif ($status === 'AVAILABLE')
+                                <form method="POST" action="{{ url('/food/'.$listing->id.'/cancel') }}" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" data-confirm="Cancel this listing? It will no longer appear in search.">Cancel</button>
                                 </form>
                             @else
                                 <span class="text-muted small">—</span>

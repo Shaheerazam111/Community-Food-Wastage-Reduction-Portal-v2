@@ -149,6 +149,43 @@ class FoodListingController extends Controller
         );
     }
 
+    // Donor withdraws an AVAILABLE listing (marks EXPIRED)
+    public function cancel(Request $request, $id)
+    {
+        $listing = FoodListing::findOrFail($id);
+
+        if ($listing->donor_id !== Auth::id()) {
+            return $this->portalBack(
+                $request,
+                ['message' => 'Only the donor can cancel this listing'],
+                403,
+                'Only the donor can cancel this listing.'
+            );
+        }
+
+        if ($listing->status !== 'AVAILABLE') {
+            return $this->portalBack(
+                $request,
+                ['message' => 'Only AVAILABLE listings can be cancelled'],
+                422,
+                'Only available listings can be cancelled.'
+            );
+        }
+
+        $listing->update([
+            'status' => 'EXPIRED',
+            'updated_at' => now(),
+        ]);
+
+        return $this->portalRedirect(
+            $request,
+            ['listing' => $listing],
+            200,
+            url()->previous() !== url()->current() ? url()->previous() : '/food/mine',
+            'Listing cancelled and removed from search.'
+        );
+    }
+
     /** Food this recipient has claimed (AVAILABLE → CLAIMED → DELIVERED lifecycle). */
     public function myClaims(Request $request)
     {

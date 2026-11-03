@@ -29,7 +29,7 @@
                         <div class="form-text">At least 6 characters.</div>
                     </div>
                     <div class="col-12 col-md-6">
-                        <label for="phone" class="form-label">Phone</label>
+                        <label for="phone" class="form-label required">Phone</label>
                         <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone') }}">
                     </div>
                 </div>
@@ -48,18 +48,18 @@
 
                 <div id="donorFields" class="row g-3 mb-3">
                     <div class="col-12 col-md-6">
-                        <label for="business_name" class="form-label">Business name</label>
+                        <label for="business_name" class="form-label required">Business name</label>
                         <input type="text" class="form-control" id="business_name" name="business_name" value="{{ old('business_name') }}">
                     </div>
                 </div>
 
                 <div id="recipientFields" class="row g-3 mb-3">
                     <div class="col-12 col-md-6">
-                        <label for="ngo_name" class="form-label">NGO name</label>
+                        <label for="ngo_name" class="form-label required">NGO name</label>
                         <input type="text" class="form-control" id="ngo_name" name="ngo_name" value="{{ old('ngo_name') }}">
                     </div>
                     <div class="col-12 col-md-6">
-                        <label for="contact_person" class="form-label">Contact person</label>
+                        <label for="contact_person" class="form-label required">Contact person</label>
                         <input type="text" class="form-control" id="contact_person" name="contact_person" value="{{ old('contact_person') }}">
                     </div>
                 </div>
@@ -67,8 +67,8 @@
                 <p class="form-section-title">Your location (used for pickup / search)</p>
                 <div class="row g-3 mb-3">
                     <div class="col-12">
-                        <label for="address" class="form-label">Address</label>
-                        <input type="text" class="form-control" id="address" name="address" value="{{ old('address') }}" placeholder="Street, area, city">
+                        <label for="address" class="form-label required">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" value="{{ old('address') }}" placeholder="Street, area, city" required>
                     </div>
                     <div class="col-12">
                         @include('partials.map_picker', ['label' => 'Pin on map', 'required' => true])
@@ -98,7 +98,20 @@
         var isDonor = document.getElementById('role_donor').checked;
         donorFields.hidden = !isDonor;
         recipientFields.hidden = isDonor;
+        document.getElementById('business_name').required = isDonor;
+        document.getElementById('phone').required = isDonor;
+        document.getElementById('ngo_name').required = !isDonor;
+        document.getElementById('contact_person').required = !isDonor;
     }
+
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+        var lat = document.querySelector('[data-map-lat]');
+        var lng = document.querySelector('[data-map-lng]');
+        if (!lat || !lng || !lat.value || !lng.value) {
+            e.preventDefault();
+            window.alert('Please click the map to set your pickup / search location.');
+        }
+    });
 
     document.querySelectorAll('input[name="role"]').forEach(function (radio) {
         radio.addEventListener('change', syncRoleSections);

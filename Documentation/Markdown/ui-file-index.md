@@ -97,4 +97,7 @@ Controllers, demo data, and routes that power the UI stubs.
 | ---- | ------------ | ------------- |
 | `portal/app/Support/DemoData.php` | Dummy users (doc path), donations (lat/lng, Expired), claims, tasks (route coords), disputes, feedback, notifications, report counts | (passed into views) |
 | `portal/app/Http/Controllers/PageController.php` | Serves every UI screen + demo POST redirects with flash messages | (all UI routes) |
-| `portal/routes/web.php` | GET/POST routes for home, auth, donor, receiver, volunteer, admin, notifications | (see Auth–Admin above) |
+| `routes/web.php` | Routes for home, auth, food API, admin, test-apis | (see repo README) |
+| `Documentation/Markdown/improvements-needed-checklist.md` | Assignment vs brief vs production checklist | (docs) |
+| `Documentation/Markdown/production-deploy.md` | Production deployment | (docs) |
+| `Documentation/Markdown/demo-and-viva-script.md` | 5-minute demo for teacher | (docs) |

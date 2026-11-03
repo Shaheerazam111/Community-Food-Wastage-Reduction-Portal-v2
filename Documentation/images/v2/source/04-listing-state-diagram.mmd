@@ -1,0 +1,15 @@
+stateDiagram-v2
+    [*] --> AVAILABLE : Donor posts listing
+
+    AVAILABLE --> CLAIMED : Recipient claim\n(atomic UPDATE)
+    AVAILABLE --> EXPIRED : expiry_at passed\nor food:expire job
+
+    CLAIMED --> DELIVERED : Donor POST deliver
+
+    DELIVERED --> [*]
+    EXPIRED --> [*]
+
+    note right of AVAILABLE
+        Hidden from search when
+        expired or not AVAILABLE
+    end note

@@ -1,58 +1,64 @@
-# Community Food Wastage Reduction Portal — v2 (Core Engine)
+# Community Food Wastage Reduction Portal — v2
 
-A separate, minimal Laravel app that implements only the **functional engine** from the
-prototype assignment: signup, posting food, nearby search, and safe claiming.
-No admin screens, no reports, no UI — this is an API tested with Postman/curl.
-The original UI project (`Community-Food-Wastage-Reduction-Portal/`) is untouched.
+Laravel web app that connects **food donors** with **NGO recipients**: register, post surplus food, search nearby, claim safely, track delivery, and view **admin reports**. Same routes work as **JSON API** (Postman / `/test-apis`) or **HTML forms** (Blade UI).
 
-## Setup
+## Features
 
-1. Create a MySQL database named `cfwrp_v2` (or edit `DB_DATABASE` in `.env`).
-2. Run migrations:
-   ```
-   php artisan migrate
-   ```
-3. Start the server:
-   ```
-   php artisan serve
-   ```
-4. (Optional) Run the hourly expiry cleanup once manually:
-   ```
-   php artisan food:expire
-   ```
-   In real deployment, `php artisan schedule:work` (or a system cron calling
-   `schedule:run` every minute) keeps this running hourly — already registered
-   in `app/Console/Kernel.php`.
+- Session auth for donor, recipient, and admin  
+- Food listing lifecycle: `AVAILABLE` → `CLAIMED` → `DELIVERED` (+ `EXPIRED`)  
+- Nearby search (Haversine + radius)  
+- Atomic claim (no double booking)  
+- Hourly expiry job (`food:expire`)  
+- Admin dashboard, analytics, CSV export  
 
-Auth is session/cookie based (Laravel's default), so requests must reuse the
-same cookie jar across calls (Postman does this automatically per collection).
-CSRF checks are skipped for `/auth/*` and `/food*` since this is a JSON API,
-not a browser form (see `app/Http/Middleware/VerifyCsrfToken.php`).
+## Quick start
 
-## Endpoints
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+# Set DB_DATABASE=cfwrp_v2 in .env, create DB in MySQL
+php artisan migrate
+php artisan db:seed --class=AdminUserSeeder
+php artisan serve
+```
+
+Open http://127.0.0.1:8000 — see [Documentation/Markdown/how-to-install-and-run.md](Documentation/Markdown/how-to-install-and-run.md) and [demo-and-viva-script.md](Documentation/Markdown/demo-and-viva-script.md).
+
+## API endpoints
 
 | Method | URL | Auth | Purpose |
-|---|---|---|---|
-| POST | `/auth/register` | - | Create donor or recipient account (`role` field) |
-| POST | `/auth/login` | - | Log in, starts session |
+|--------|-----|------|---------|
+| POST | `/auth/register` | - | Create donor or recipient |
+| POST | `/auth/login` | - | Start session |
 | POST | `/auth/logout` | yes | End session |
-| POST | `/food` | yes (donor) | Create a food listing |
-| GET | `/food/mine` | yes (donor) | List my own listings |
-| GET | `/food/search?latitude=&longitude=&radius_km=` | - | Nearby AVAILABLE, non-expired listings, closest first |
-| POST | `/food/{id}/claim` | yes (recipient) | Atomically claim a listing |
-| POST | `/food/{id}/deliver` | yes (donor) | Mark a CLAIMED listing DELIVERED |
+| POST | `/food` | yes (donor) | Create listing |
+| GET | `/food/mine` | yes (donor) | My listings |
+| GET | `/food/search?latitude=&longitude=&radius_km=` | - | Nearby available food |
+| POST | `/food/{id}/claim` | yes (recipient) | Claim listing |
+| POST | `/food/{id}/deliver` | yes (donor) | Mark delivered |
+| POST | `/food/{id}/cancel` | yes (donor) | Withdraw AVAILABLE listing |
+| GET | `/food/claims` | yes (recipient) | My claims |
 
-## How the 3 challenges were solved
+Admin UI: `/admin/dashboard`, `/admin/reports`
 
-- **Distance search** (`FoodListingController::search`): raw SQL Haversine formula
-  in a `selectRaw`, filtered with `havingRaw('distance_km <= ?')`, ordered by
-  `distance_km`. See [`app/Http/Controllers/FoodListingController.php`](app/Http/Controllers/FoodListingController.php).
-- **Double-claim race condition** (`ClaimController::claim`): a single atomic
-  `UPDATE ... WHERE status = 'AVAILABLE'`. If 0 rows are affected, someone else
-  already claimed it. See [`app/Http/Controllers/ClaimController.php`](app/Http/Controllers/ClaimController.php).
-- **Expired food**: `search()` always filters `expiry_at > now()` (lazy filtering),
-  and `php artisan food:expire` (scheduled hourly) sweeps stale AVAILABLE rows to
-  EXPIRED. See [`app/Console/Commands/ExpireFoodListings.php`](app/Console/Commands/ExpireFoodListings.php).
+## Assignment challenges
 
-Both were manually verified: two concurrent `claim` requests on the same listing
-result in exactly one `"Claim successful"` and one `409 already claimed` — never both.
+1. **Distance** — Haversine in `FoodListing::searchAvailableNearby`  
+2. **Race-safe claim** — conditional `UPDATE` in `ClaimController`  
+3. **Expiry** — filter in search/claim + `php artisan food:expire` (scheduled hourly)
+
+## Documentation
+
+| Doc | Purpose |
+|-----|---------|
+| [SRS-v2](Documentation/Markdown/SRS-v2/SRS-v2-main.md) | Requirements aligned with code |
+| [improvements-needed-checklist.md](Documentation/Markdown/improvements-needed-checklist.md) | Assignment vs full brief + production checklist |
+| [production-deploy.md](Documentation/Markdown/production-deploy.md) | Server deployment |
+| [Documentation/postman_collection.json](Documentation/postman_collection.json) | API tests |
+
+CSRF is skipped for `/auth/*` and `/food*` for JSON clients (`VerifyCsrfToken`); browser forms still send `@csrf` where required.
+
+## Production
+
+Set `APP_ENV=production`, `APP_DEBUG=false`, HTTPS, and cron for `schedule:run`. Details: [production-deploy.md](Documentation/Markdown/production-deploy.md).
