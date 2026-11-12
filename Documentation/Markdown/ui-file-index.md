@@ -20,6 +20,10 @@ Layouts, CSS, JS, home, notifications, and shared partials (used across roles).
 | `portal/resources/views/notifications/index.blade.php` | Dummy notification list with Mark as read | `/notifications`, POST `/notifications/{id}/read` |
 | `portal/resources/views/partials/map_embed.blade.php` | Read-only OpenStreetMap iframe + Open in Maps link | (included by browse/detail/claim/task) |
 | `portal/resources/views/partials/map_picker.blade.php` | Clickable Leaflet map to set pickup pin (hidden lat/lng) | (included by post/edit donation) |
+| `resources/views/partials/role_nav.blade.php` | Picks admin/donor/recipient/volunteer nav by logged-in role | (included by notifications and similar) |
+| `resources/views/partials/donor_nav.blade.php` | Donor navbar links + notifications | (included by donor pages) |
+| `resources/views/profile/edit.blade.php` | Update name, email, role fields, map pin, password | `/profile`, POST `/profile` |
+| `app/Http/Controllers/ProfileController.php` | Profile form + save | `/profile` |
 
 ---
 
@@ -73,9 +77,26 @@ Volunteer task list and task detail with route maps.
 
 ---
 
+## Notifications
+
+| File | What it does | Related route |
+| ---- | ------------ | ------------- |
+| `resources/views/notifications/index.blade.php` | Dashboard alerts list + mark read | `/notifications`, POST `/notifications/{id}/read` |
+
+---
+
+## Volunteer
+
+| File | What it does | Related route |
+| ---- | ------------ | ------------- |
+| `resources/views/volunteer/tasks/index.blade.php` | CLAIMED pickup tasks + complete | `/volunteer/tasks`, POST `/volunteer/tasks/{id}/complete` |
+| `resources/views/partials/volunteer_nav.blade.php` | Volunteer nav | (included) |
+
+---
+
 ## Admin
 
-Admin dashboard and live MySQL reports (v2). User moderation / disputes not built yet.
+Admin dashboard, reports, and user block/unblock.
 
 | File | What it does | Related route |
 | ---- | ------------ | ------------- |
@@ -86,6 +107,17 @@ Admin dashboard and live MySQL reports (v2). User moderation / disputes not buil
 | `app/Http/Controllers/AdminReportController.php` | Reports + CSV | `/admin/reports`, `/admin/reports/export` |
 | `app/Services/AdminReportService.php` | Report SQL aggregations | (used by admin controllers) |
 | `app/Http/Middleware/EnsureUserIsAdmin.php` | Blocks non-admin users | `admin` middleware |
+| `resources/views/admin/users/index.blade.php` | Block/unblock users | `/admin/users`, POST `/admin/users/{id}` |
+| `app/Http/Controllers/AdminUserController.php` | User list + is_active toggle | `/admin/users` |
+| `app/Http/Controllers/NotificationController.php` | Alerts list | `/notifications` |
+| `app/Http/Controllers/FeedbackController.php` | Post-delivery rating | POST `/food/{listing}/feedback` |
+| `app/Http/Controllers/VolunteerController.php` | Pickup tasks | `/volunteer/tasks` |
+| `resources/views/admin/verification/index.blade.php` | Review NGO documents | `/admin/verification` |
+| `resources/views/admin/listings/index.blade.php` | Approve/reject food listings | `/admin/listings` |
+| `resources/views/recipient/verification/show.blade.php` | NGO upload + status | `/recipient/verification` |
+| `app/Http/Controllers/AdminVerificationController.php` | Doc review + download | `/admin/verification` |
+| `app/Http/Controllers/AdminListingModerationController.php` | Listing moderation | `/admin/listings` |
+| `app/Http/Controllers/RecipientVerificationController.php` | NGO re-upload | `/recipient/verification` |
 
 ---
 

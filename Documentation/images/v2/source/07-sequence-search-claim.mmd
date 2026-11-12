@@ -1,33 +1,21 @@
 sequenceDiagram
     autonumber
-    actor NGO as Recipient NGO
-    participant Browser
+    actor NGO as Recipient
     participant Food as FoodListingController
-    participant Model as FoodListing searchAvailableNearby
     participant Claim as ClaimController
-    participant DB as MySQL food_listings
+    participant DB as food_listings
+    participant NS as NotificationService
 
-    rect rgb(240, 255, 240)
-        Note over NGO,DB: Nearby search
-        NGO->>Browser: Enter lat/lng/radius
-        Browser->>Food: GET /food/search
-        Food->>Food: Validate coordinates
-        Food->>Model: Haversine query
-        Model->>DB: SELECT AVAILABLE, not expired, HAVING distance
-        DB-->>Model: Rows + distance_km
-        Model-->>Food: Sorted listings
-        Food-->>Browser: HTML table or JSON
-    end
+    NGO->>Food: GET /food/search
+    Food->>DB: SELECT AVAILABLE APPROVED not expired
+    Food-->>NGO: List with distance
 
-    rect rgb(255, 240, 240)
-        Note over NGO,DB: Atomic claim
-        NGO->>Browser: Claim listing id
-        Browser->>Claim: POST /food/{id}/claim
-        Claim->>Claim: role === recipient?
-        Claim->>DB: UPDATE ... WHERE AVAILABLE AND not expired
-        alt 0 rows updated
-            Claim-->>Browser: 409 already claimed or expired
-        else 1 row updated
-            Claim-->>Browser: Success → /food/claims or JSON
-        end
+    NGO->>Claim: POST /food/id/claim
+    Claim->>Claim: verification_status approved?
+    Claim->>DB: UPDATE WHERE AVAILABLE APPROVED
+    alt row updated
+        Claim->>NS: notify donor
+        Claim-->>NGO: Success
+    else zero rows
+        Claim-->>NGO: 409 error
     end

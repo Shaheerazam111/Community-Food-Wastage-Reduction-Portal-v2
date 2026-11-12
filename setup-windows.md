@@ -58,6 +58,7 @@ copy .env.example .env
 Edit `.env`:
 
 ```env
+APP_URL=http://127.0.0.1:8000
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=cfwrp_v2
@@ -65,13 +66,18 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
+Use the **same host** in the browser as `APP_URL` (e.g. always `http://127.0.0.1:8000`, not `localhost`), or session cookies will not stick when you click nav links.
+
 Then:
 
 ```cmd
 composer install
 php artisan key:generate
 php artisan migrate
+php artisan db:seed --class=UserSeeder
 ```
+
+Demo logins: `admin@foodportal.test` / `admin123`, `donor@foodportal.test` / `donor123`, `ngo@foodportal.test` / `ngo123`, `volunteer@foodportal.test` / `volunteer123`.
 
 ## 7. Run
 

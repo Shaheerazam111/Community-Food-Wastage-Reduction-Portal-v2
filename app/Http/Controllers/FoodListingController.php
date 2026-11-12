@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\HandlesPortalResponses;
 use App\Models\FoodListing;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -28,6 +29,7 @@ class FoodListingController extends Controller
             'category' => ['required', Rule::in(['veg', 'non_veg'])],
             'quantity' => 'required|string|max:100',
             'expiry_at' => 'required|date|after:now',
+            'photo' => 'nullable|image|max:2048',
         ]);
 
         $donor = Auth::user();
@@ -43,17 +45,30 @@ class FoodListingController extends Controller
 
         $data['donor_id'] = $donor->id;
         $data['pickup_address'] = $donor->address ?? $donor->business_name ?? 'Donor location';
+        $data['city'] = $this->guessCityFromAddress($data['pickup_address']);
         $data['latitude'] = $donor->latitude;
         $data['longitude'] = $donor->longitude;
 
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('food-photos', 'public');
+        }
+        unset($data['photo']);
+
+        $autoApprove = app()->environment('local');
+        $data['moderation_status'] = $autoApprove ? 'APPROVED' : 'PENDING';
+
         $listing = FoodListing::create($data);
+
+        $flash = $autoApprove
+            ? 'Listing posted. NGOs can find it in search now.'
+            : 'Listing submitted. It will appear in search after admin approval.';
 
         return $this->portalRedirect(
             $request,
             ['listing' => $listing],
             201,
             '/food/mine',
-            'Food listing posted (POST /food).'
+            $flash
         );
     }
 
@@ -78,18 +93,36 @@ class FoodListingController extends Controller
     public function search(Request $request)
     {
         $data = $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            'city' => 'nullable|string|max:120',
+            'latitude' => 'required_without:city|nullable|numeric|between:-90,90',
+            'longitude' => 'required_without:city|nullable|numeric|between:-180,180',
             'radius_km' => 'nullable|numeric|min:0.1|max:100',
         ]);
 
         $radiusKm = $data['radius_km'] ?? 5;
+        $city = isset($data['city']) ? trim($data['city']) : '';
 
-        $listings = FoodListing::searchAvailableNearby(
-            (float) $data['latitude'],
-            (float) $data['longitude'],
-            (float) $radiusKm
-        );
+        $searchLat = null;
+        $searchLng = null;
+
+        if ($city !== '') {
+            $listings = FoodListing::searchAvailableByCity($city);
+            $searchLat = Auth::user()?->latitude;
+            $searchLng = Auth::user()?->longitude;
+            $listings = FoodListing::attachDistanceKm($listings, $searchLat, $searchLng);
+            $latitude = $searchLat;
+            $longitude = $searchLng;
+        } else {
+            $searchLat = (float) $data['latitude'];
+            $searchLng = (float) $data['longitude'];
+            $listings = FoodListing::searchAvailableNearby(
+                $searchLat,
+                $searchLng,
+                (float) $radiusKm
+            );
+            $latitude = $searchLat;
+            $longitude = $searchLng;
+        }
 
         if ($this->wantsJson($request)) {
             return response()->json(['listings' => $listings]);
@@ -99,12 +132,18 @@ class FoodListingController extends Controller
             return redirect('/login')->with('error', 'Log in as a recipient (NGO) to search food.');
         }
 
+        $pendingNearby = ($city === '' && $searchLat !== null && $searchLng !== null)
+            ? FoodListing::countPendingModerationNearby($searchLat, $searchLng, (float) $radiusKm)
+            : 0;
+
         return view('recipient.food.index', [
             'listings' => $listings,
-            'latitude' => $data['latitude'],
-            'longitude' => $data['longitude'],
+            'latitude' => $latitude,
+            'longitude' => $longitude,
             'radius_km' => $radiusKm,
+            'city' => $city,
             'searched' => true,
+            'pendingNearby' => $pendingNearby,
         ]);
     }
 
@@ -134,6 +173,14 @@ class FoodListingController extends Controller
             'status' => 'DELIVERED',
             'delivered_at' => now(),
         ]);
+
+        if ($listing->claimedBy) {
+            app(NotificationService::class)->notify(
+                $listing->claimedBy,
+                'Pickup marked delivered',
+                'The donor marked "'.$listing->title.'" as delivered. You can leave feedback under My claims.'
+            );
+        }
 
         $back = url()->previous();
         if ($back === url()->current()) {
@@ -191,6 +238,7 @@ class FoodListingController extends Controller
     {
         $listings = FoodListing::where('claimed_by', Auth::id())
             ->with('donor:id,name,business_name,phone,address,latitude,longitude')
+            ->with('feedbacks')
             ->orderByDesc('claimed_at')
             ->get();
 
@@ -204,4 +252,15 @@ class FoodListingController extends Controller
 
         return view('recipient.claims.index', ['claims' => $listings]);
     }
+
+    private function guessCityFromAddress(string $address): ?string
+    {
+        $parts = array_map('trim', explode(',', $address));
+        if (count($parts) === 0) {
+            return null;
+        }
+
+        return $parts[count($parts) - 1] ?: null;
+    }
+
 }

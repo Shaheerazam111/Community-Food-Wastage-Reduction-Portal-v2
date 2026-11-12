@@ -1,106 +1,75 @@
 # Improvements & production readiness checklist
 
-Based on [project-requirements.md](project-requirements.md) (supervisor brief) and [Community_Food_Wastage_Reduction_Portal_Assignment_v2.md](../Community_Food_Wastage_Reduction_Portal_Assignment_v2.md) (prototype assignment).
+Based on [project-requirements.md](project-requirements.md) and [Community_Food_Wastage_Reduction_Portal_Assignment_v2.md](../Community_Food_Wastage_Reduction_Portal_Assignment_v2.md).
 
-**Legend:** `[x]` done in repo · `[ ]` not done (Phase 2 or optional)
+**Legend:** `[x]` done · `[ ]` not done  
 
-Update this file when you ship a item. Mirror summary in [SRS-v2/SRS-v2-main.md](SRS-v2/SRS-v2-main.md#10-production--submission-checklist).
+**Resolution log:** [issues-resolved-log.md](issues-resolved-log.md)
+
+Mirror: [SRS-v2/SRS-v2-main.md](SRS-v2/SRS-v2-main.md#10-production--submission-checklist)
 
 ---
 
-## A. Assignment v2 — core engine (submission baseline)
+## A. Assignment v2 — core engine
 
 | Status | Item |
 | ------ | ---- |
-| [x] | **Task 1** — Register/login/logout with session auth |
-| [x] | **Task 1** — Donor profile fields (business, phone, address, lat/lng) |
-| [x] | **Task 1** — Recipient profile fields (NGO, contact, address, lat/lng) |
-| [x] | **Task 2** — Post food listing (title, category, quantity, expiry) |
-| [x] | **Task 2** — Status flow AVAILABLE → CLAIMED → DELIVERED |
-| [x] | **Task 3** — Nearby search with radius, closest first |
-| [x] | **Task 3** — Hide claimed and expired from search |
-| [x] | **Task 4** — Atomic claim (no double booking) |
-| [x] | **Challenge 1** — Haversine distance in SQL |
-| [x] | **Challenge 2** — Conditional UPDATE on claim |
-| [x] | **Challenge 3** — Lazy expiry filter + `food:expire` schedule |
-| [x] | Postman collection + `/test-apis` for demo |
-| [x] | Blade UI for donor / recipient core paths |
-| [x] | Admin reports (beyond assignment minimum) |
-| [x] | SRS v2 + Mermaid diagram PNGs |
+| [x] | Tasks 1–4 + three challenges + UI + admin reports + SRS v2 |
 
 ---
 
-## B. Supervisor brief — full portal (Phase 2)
-
-From [project-requirements.md](project-requirements.md). Not required for assignment v2 pass; needed only if teacher expects the **full** brief.
+## B. Supervisor brief — full portal
 
 | Status | Requirement |
 | ------ | ----------- |
-| [x] | Donors + recipients + admin roles (volunteer as separate login — see below) |
-| [ ] | **Volunteer** role: pickup tasks and status updates |
-| [x] | Food listing: name, category, quantity, best-before |
-| [ ] | **Photos** on listings (Firebase or local storage) |
-| [x] | Search by **geographic location** (GPS + radius) |
-| [ ] | Search by **city name** without coordinates |
-| [x] | Claim prevents multiple NGOs on same item |
-| [x] | Status Available → Claimed → Delivered |
-| [ ] | **Notification engine** (email or dashboard) for new nearby food |
-| [ ] | **Feedback & rating** after pickup |
-| [ ] | NGO **verification documents** + admin approve |
-| [ ] | Admin **user verification** (block/approve NGOs) |
-| [ ] | Admin **moderate listings** (approve/reject before live) |
-| [x] | **Admin reports** (analytics; CSV export) |
-| [ ] | Donor dashboard **“meals saved”** metric from quantity parsing |
-| [ ] | **Real-time alerts** UI for donors/recipients |
-| [ ] | Google Maps API (optional; OSM/Leaflet used today) |
+| [x] | Donors + recipients + admin roles |
+| [x] | **Volunteer** role: pickup task list + mark complete → DELIVERED |
+| [x] | Food listing fields + best-before |
+| [x] | **Photos** on listings (local storage, optional upload) |
+| [x] | Search by **GPS + radius** |
+| [x] | Search by **city name** (`?city=`) |
+| [x] | Safe claim + status workflow |
+| [x] | **Dashboard notifications** (new food nearby, claimed, delivered) |
+| [x] | **Feedback & rating** after delivery (My claims) |
+| [x] | NGO **verification documents** + admin document review |
+| [x] | Admin **block/unblock users** (`/admin/users`) |
+| [x] | Admin **moderate listings** (approve/reject before live) |
+| [x] | Admin reports + CSV |
+| [x] | Donor **meals saved (est.)** on dashboard |
+| [x] | **Alerts** nav + unread count |
+| [ ] | Google Maps API (OSM/Leaflet used instead) |
 
 ---
 
-## C. Production & operations readiness
-
-| Status | Item | Notes |
-| ------ | ---- | ----- |
-| [x] | MySQL required; migrations documented | `cfwrp_v2` |
-| [x] | `.env.example` with DB + production hints | |
-| [x] | Install guide matches **repo root** (not `portal/`) | [how-to-install-and-run.md](how-to-install-and-run.md) |
-| [x] | [production-deploy.md](production-deploy.md) — deploy, cron, cache | |
-| [x] | Register **requires** address + map pin (lat/lng) | Server + client validation |
-| [x] | Role-specific profile fields required on register | Matches assignment profiles |
-| [x] | Rate limit on `/auth/*` POST | Brute-force mitigation |
-| [x] | HTTPS URL forcing when `APP_ENV=production` | `AppServiceProvider` |
-| [x] | Secure session cookie flag documented for HTTPS | `.env` comment |
-| [x] | Donor can **withdraw** AVAILABLE listing | `POST /food/{id}/cancel` → EXPIRED |
-| [x] | Admin user via `AdminUserSeeder` / `SEED_ADMIN` | Not in public register |
-| [x] | Scheduler documented for `food:expire` | Cron every minute → `schedule:run` |
-| [ ] | Automated tests (PHPUnit feature tests for claim/search) | Recommended |
-| [ ] | `APP_DEBUG=false` verified on staging | Manual before go-live |
-| [ ] | Remove unused `food` table migration | Cleanup |
-| [ ] | Email (SMTP) for notifications | Phase 2 |
-| [ ] | Backups (MySQL dump schedule) | Server ops |
-| [ ] | Error monitoring (Sentry etc.) | Optional |
-
----
-
-## D. Documentation & teacher demo
+## C. Production & operations
 
 | Status | Item |
 | ------ | ---- |
-| [x] | README reflects UI + admin + endpoints |
-| [x] | [demo-and-viva-script.md](demo-and-viva-script.md) — 5‑minute demo |
-| [x] | [SRS-v2](SRS-v2/SRS-v2-main.md) aligned with code |
-| [x] | [ui-file-index.md](ui-file-index.md) paths at repo root |
-| [x] | Scope statement for viva (Phase 1 vs full brief) | In demo script |
-| [ ] | Screen recording or screenshot appendix | Your submission |
+| [x] | Install / deploy docs |
+| [x] | Register validation + rate limit + HTTPS in production |
+| [x] | Cancel AVAILABLE listings |
+| [x] | **PHPUnit** feature tests (search + claim race) |
+| [x] | **Drop legacy `food` table** |
+| [ ] | `APP_DEBUG=false` verified on staging (manual) |
+| [ ] | Email SMTP for notifications |
+| [ ] | DB backup schedule (server) |
+| [ ] | Error monitoring (optional) |
 
 ---
 
-## E. Suggested order before submission
+## D. Documentation & demo
 
-1. Run through [demo-and-viva-script.md](demo-and-viva-script.md) on a clean DB.  
-2. Tick section **A** — all should be `[x]`.  
-3. For viva, explain section **B** as **Phase 2** unless teacher confirms full brief.  
-4. Section **C** — complete all `[x]`; plan `[ ]` after submission if needed.
+| Status | Item |
+| ------ | ---- |
+| [x] | README, demo script, SRS v2, ui-file-index |
+| [ ] | Screen recording / screenshot appendix (your submission) |
 
 ---
 
-*Last aligned with codebase: production pass (register validation, deploy docs, cancel listing, throttling).*
+## E. Before submission
+
+1. `php artisan migrate`  
+2. `php artisan db:seed --class=UserSeeder`  
+3. `php artisan storage:link` (for food photos)  
+4. Run [demo-and-viva-script.md](demo-and-viva-script.md)  
+5. `php artisan test`

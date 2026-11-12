@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FoodListing;
+use App\Support\MealsEstimate;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -33,10 +34,13 @@ class PortalController extends Controller
             ->take(10)
             ->get();
 
+        $deliveredListings = FoodListing::where('donor_id', $donorId)->where('status', 'DELIVERED')->get();
+
         $stats = [
             'available' => FoodListing::where('donor_id', $donorId)->where('status', 'AVAILABLE')->count(),
             'claimed' => FoodListing::where('donor_id', $donorId)->where('status', 'CLAIMED')->count(),
-            'delivered' => FoodListing::where('donor_id', $donorId)->where('status', 'DELIVERED')->count(),
+            'delivered' => $deliveredListings->count(),
+            'meals_saved' => $deliveredListings->sum(fn ($row) => MealsEstimate::fromQuantityString($row->quantity)),
         ];
 
         return view('donor.dashboard', compact('listings', 'stats'));
@@ -65,7 +69,9 @@ class PortalController extends Controller
             'latitude' => $user->latitude,
             'longitude' => $user->longitude,
             'radius_km' => 5,
+            'city' => '',
             'searched' => false,
+            'pendingNearby' => 0,
         ]);
     }
 

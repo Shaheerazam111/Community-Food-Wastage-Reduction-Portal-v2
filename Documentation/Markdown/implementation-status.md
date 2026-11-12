@@ -42,7 +42,7 @@ Use this so you do not assume features from the SRS or old UI docs are already i
 
 | Feature | Status |
 | --- | --- |
-| Admin role + middleware | Done — migration adds `admin` to `users.role`; seed with `AdminUserSeeder` |
+| Admin role + middleware | Done — migration adds `admin` to `users.role`; seed with `UserSeeder` |
 | Admin dashboard | Done — `/admin/dashboard` |
 | Reports (filters, trends, leaders, CSV) | Done — `/admin/reports` |
 | User verify, moderate listings, disputes | Not built |

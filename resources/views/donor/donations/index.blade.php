@@ -3,9 +3,7 @@
 @section('title', 'My Listings')
 
 @section('nav')
-<li class="nav-item"><a class="nav-link" href="{{ url('/donor/dashboard') }}">Dashboard</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ url('/donor/donations/create') }}">Post food</a></li>
-<li class="nav-item"><a class="nav-link active" href="{{ url('/food/mine') }}">My listings</a></li>
+@include('partials.donor_nav')
 @endsection
 
 @section('content')

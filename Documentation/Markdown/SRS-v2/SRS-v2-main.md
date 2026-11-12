@@ -290,17 +290,22 @@ Master checklist (tick boxes maintained there): **[improvements-needed-checklist
 | [x] | Auth POST rate limiting |
 | [x] | HTTPS scheme when `APP_ENV=production` |
 | [x] | Donor cancel AVAILABLE listing |
-| [x] | Admin seeder + demo script |
-| [ ] | PHPUnit feature tests for claim/search |
+| [x] | Admin + volunteer seeders + demo script |
+| [x] | PHPUnit feature tests for claim/search |
+| [x] | Drop legacy `food` table |
 | [ ] | Staging run with `APP_DEBUG=false` |
 
 ### 10.3 Full supervisor brief — Phase 2
 
 | Status | Item |
 | ------ | ---- |
-| [ ] | Notifications, feedback, volunteer role |
-| [ ] | Photos, NGO verification, listing moderation |
-| [ ] | City-based search without GPS |
+| [x] | Dashboard notifications, feedback, volunteer tasks |
+| [x] | Listing photos (local), city search, meals saved metric |
+| [x] | Admin user block/unblock |
+| [x] | NGO document verification, listing moderation before publish |
+| [ ] | Email alerts (dashboard alerts implemented) |
+
+**Change log:** [issues-resolved-log.md](../issues-resolved-log.md) · **Master checklist:** [improvements-needed-checklist.md](../improvements-needed-checklist.md)
 
 See section **B** in [improvements-needed-checklist.md](../improvements-needed-checklist.md).
 

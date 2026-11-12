@@ -3,9 +3,7 @@
 @section('title', 'Donor Dashboard')
 
 @section('nav')
-<li class="nav-item"><a class="nav-link active" href="{{ url('/donor/dashboard') }}">Dashboard</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ url('/donor/donations/create') }}">Post food</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ url('/food/mine') }}">My listings</a></li>
+@include('partials.donor_nav')
 @endsection
 
 @section('content')
@@ -31,6 +29,13 @@
         <div class="stat-card">
             <div class="text-muted small">Delivered</div>
             <div class="fs-4">{{ $stats['delivered'] }}</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="stat-card">
+            <div class="text-muted small">Meals saved (est.)</div>
+            <div class="fs-4">{{ $stats['meals_saved'] ?? 0 }}</div>
+            <div class="small text-muted">From delivered listing quantities</div>
         </div>
     </div>
 </div>

@@ -29,6 +29,7 @@
                         <th>Claimed at</th>
                         <th>Pickup</th>
                         <th>Donor</th>
+                        <th>Feedback</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,10 +63,32 @@
                                     —
                                 @endif
                             </td>
+                            <td class="small">
+                                @php
+                                    $myFeedback = $claim->feedbacks->where('recipient_id', auth()->id())->first();
+                                @endphp
+                                @if ($claim->status === 'DELIVERED' && ! $myFeedback)
+                                    <form method="POST" action="{{ url('/food/'.$claim->id.'/feedback') }}" class="d-flex flex-column gap-1">
+                                        @csrf
+                                        <select name="rating" class="form-select form-select-sm" required>
+                                            <option value="">Rating</option>
+                                            @for ($r = 5; $r >= 1; $r--)
+                                                <option value="{{ $r }}">{{ $r }} stars</option>
+                                            @endfor
+                                        </select>
+                                        <input type="text" name="comment" class="form-control form-control-sm" placeholder="Short comment">
+                                        <button type="submit" class="btn btn-sm btn-outline-brand">Submit</button>
+                                    </form>
+                                @elseif ($myFeedback)
+                                    {{ $myFeedback->rating }}/5 — {{ $myFeedback->comment ?: 'No comment' }}
+                                @else
+                                    <span class="text-muted">After delivery</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-muted p-3">
+                            <td colspan="7" class="text-muted p-3">
                                 No claims yet. Use <a href="{{ url('/recipient/food') }}">Find food</a> and press Claim.
                             </td>
                         </tr>

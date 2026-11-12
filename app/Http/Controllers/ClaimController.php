@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\HandlesPortalResponses;
+use App\Models\FoodListing;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,9 +25,19 @@ class ClaimController extends Controller
             );
         }
 
+        if (Auth::user()->verification_status !== 'approved') {
+            return $this->portalBack(
+                $request,
+                ['message' => 'NGO verification required'],
+                403,
+                'Your NGO document must be approved before you can claim food.'
+            );
+        }
+
         $updated = DB::table('food_listings')
             ->where('id', $id)
             ->where('status', 'AVAILABLE')
+            ->where('moderation_status', 'APPROVED')
             ->where('expiry_at', '>', now())
             ->update([
                 'status' => 'CLAIMED',
@@ -39,6 +52,17 @@ class ClaimController extends Controller
                 ['message' => 'This item was already claimed or has expired'],
                 409,
                 'This food was already claimed or has expired.'
+            );
+        }
+
+        $listing = FoodListing::with('donor')->find($id);
+        if ($listing && $listing->donor) {
+            $claimer = User::find(Auth::id());
+            $ngoLabel = $claimer?->ngo_name ?? $claimer?->name ?? 'An NGO';
+            app(NotificationService::class)->notify(
+                $listing->donor,
+                'Your food was claimed',
+                $ngoLabel.' claimed "'.$listing->title.'".'
             );
         }
 

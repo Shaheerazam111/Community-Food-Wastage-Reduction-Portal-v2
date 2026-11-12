@@ -69,7 +69,8 @@ If text still looks small, edit the `.mmd` file (shorter labels) or add a Mermai
 | Planned filename | Source spec |
 | ---------------- | ----------- |
 | `figure-01-use-case.png` | `01-use-case-diagram.md` |
-| `figure-02-erd.png` | `02-erd-database.md` |
+| `figure-02-erd.png` | `02-erd-database.md` (Mermaid crow’s-foot) |
+| `figure-02-erd-chen.png` | Chen notation — `python Documentation/images/v2/source/generate_chen_erd.py` |
 | `figure-03-system-architecture.png` | `03-system-architecture.md` |
 | `figure-04-listing-state.png` | `04-listing-state-diagram.md` |
 | `figure-05-sequence-auth.png` | `05-sequence-auth.md` |

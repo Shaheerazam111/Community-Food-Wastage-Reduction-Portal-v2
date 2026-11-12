@@ -42,7 +42,8 @@ Run migrations and optional admin seed:
 
 ```bash
 php artisan migrate --force
-SEED_ADMIN=true php artisan db:seed --class=AdminUserSeeder
+php artisan storage:link
+php artisan db:seed --class=UserSeeder
 ```
 
 Change the default admin password after first login (or edit the seeder before deploy).

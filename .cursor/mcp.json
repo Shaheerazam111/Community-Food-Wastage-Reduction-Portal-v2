@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "mermaid": {
+      "command": "npx",
+      "args": ["-y", "@peng-shawn/mermaid-mcp-server"],
+      "env": {
+        "CONTENT_IMAGE_SUPPORTED": "false"
+      }
+    },
+    "ppt": {
+      "command": "uvx",
+      "args": [
+        "--with", "mcp<2",
+        "--from", "office-powerpoint-mcp-server",
+        "ppt_mcp_server"
+      ],
+      "env": {}
+    },
+    "word": {
+      "command": "uvx",
+      "args": ["--from", "office-word-mcp-server", "word_mcp_server"]
+    },
+    "office-word": {
+      "command": "uvx",
+      "args": ["mcp-server-office"]
+    }
+  }
+}

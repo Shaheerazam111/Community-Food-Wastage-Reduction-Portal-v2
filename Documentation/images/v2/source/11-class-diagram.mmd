@@ -1,0 +1,70 @@
+classDiagram
+    direction TB
+
+    class User {
+        +id
+        +email
+        +role
+        +verification_status
+        +is_active
+        +latitude
+        +longitude
+        foodListings() hasMany
+        verificationDocuments() hasMany
+        homePath()
+        isNgoApproved()
+    }
+
+    class FoodListing {
+        +donor_id
+        +title
+        +category
+        +status
+        +moderation_status
+        +expiry_at
+        +claimed_by
+        donor() belongsTo
+        claimedBy() belongsTo
+        feedbacks() hasMany
+        searchAvailableNearby()
+    }
+
+    class PortalNotification {
+        +user_id
+        +title
+        +body
+        +read_at
+        user() belongsTo
+    }
+
+    class VerificationDocument {
+        +user_id
+        +file_path
+        +status
+        +reviewed_by
+        user() belongsTo
+        reviewer() belongsTo
+    }
+
+    class ListingFeedback {
+        +food_listing_id
+        +recipient_id
+        +rating
+        +comment
+        listing() belongsTo
+        recipient() belongsTo
+    }
+
+    class NotificationService {
+        +notify(user, title, body)
+    }
+
+    User "1" --> "*" FoodListing : donor_id
+    User "1" --> "*" FoodListing : claimed_by
+    User "1" --> "*" PortalNotification
+    User "1" --> "*" VerificationDocument : NGO upload
+    User "0..1" --> "*" VerificationDocument : reviewed_by admin
+    User "1" --> "*" ListingFeedback : recipient_id
+    FoodListing "1" --> "*" ListingFeedback
+    NotificationService ..> PortalNotification : create
+    NotificationService ..> User

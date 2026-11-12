@@ -1,37 +1,41 @@
 flowchart LR
-    subgraph Portal["Community Food Wastage Reduction Portal v2"]
-        UC01([Register])
-        UC02([Login / Logout])
-        UC03([Post food listing])
-        UC04([View my listings])
-        UC05([Mark delivered])
-        UC06([Search nearby food])
-        UC07([Claim listing])
-        UC08([View my claims])
-        UC09([Admin dashboard])
-        UC10([Reports and CSV export])
-        UC11([Expire stale listings])
+    subgraph Portal["Food Wastage Reduction Portal v2"]
+        direction TB
+        UC01([Register / Login])
+        UC02([Post listing])
+        UC03([Search / Claim])
+        UC04([Deliver / Volunteer pickup])
+        UC05([Notifications])
+        UC06([NGO verification docs])
+        UC07([Listing moderation])
+        UC08([Admin reports CSV])
+        UC09([Feedback after delivery])
+        UC10([Expire listings job])
     end
 
     Donor((Donor))
     NGO((Recipient NGO))
+    Vol((Volunteer))
     Admin((Admin))
     Sys((System))
 
     Donor --> UC01
     Donor --> UC02
-    Donor --> UC03
     Donor --> UC04
-    Donor --> UC05
 
     NGO --> UC01
-    NGO --> UC02
+    NGO --> UC03
     NGO --> UC06
-    NGO --> UC07
-    NGO --> UC08
+    NGO --> UC09
 
-    Admin --> UC02
-    Admin --> UC09
-    Admin --> UC10
+    Vol --> UC04
 
-    Sys --> UC11
+    Admin --> UC01
+    Admin --> UC06
+    Admin --> UC07
+    Admin --> UC08
+
+    Sys --> UC05
+    Sys --> UC10
+    UC02 -.-> UC07
+    UC03 -.-> UC05

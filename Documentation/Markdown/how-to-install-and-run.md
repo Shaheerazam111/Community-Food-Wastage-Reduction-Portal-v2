@@ -57,12 +57,19 @@ CREATE DATABASE cfwrp_v2;
 
 ```bash
 php artisan migrate
-php artisan db:seed --class=AdminUserSeeder
+php artisan db:seed --class=UserSeeder
 ```
 
-Default admin (change in production): `admin@foodportal.test` / `admin123`
+Demo logins (change passwords in production):
 
-Optional: set `SEED_ADMIN=true` before `php artisan db:seed` if you extend `DatabaseSeeder`.
+| Role | Email | Password |
+| ---- | ----- | -------- |
+| Admin | `admin@foodportal.test` | `admin123` |
+| Donor | `donor@foodportal.test` | `donor123` |
+| NGO | `ngo@foodportal.test` | `ngo123` |
+| Volunteer | `volunteer@foodportal.test` | `volunteer123` |
+
+Optional: set `SEED_DEMO_USERS=true` (or legacy `SEED_ADMIN=true`) then run `php artisan db:seed` to call `UserSeeder` via `DatabaseSeeder`.
 
 ---
 
@@ -112,7 +119,7 @@ See [production-deploy.md](production-deploy.md).
 | ----- | --- |
 | No application key | `php artisan key:generate` |
 | Donor cannot post | Register with map pin (lat/lng required) |
-| Admin login fails | `php artisan db:seed --class=AdminUserSeeder` |
+| Demo login fails | `php artisan db:seed --class=UserSeeder` |
 | Port 8000 in use | `php artisan serve --port=8080` |
 
 ---

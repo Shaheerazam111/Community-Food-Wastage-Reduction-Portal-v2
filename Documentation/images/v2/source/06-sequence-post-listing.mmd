@@ -3,21 +3,14 @@ sequenceDiagram
     actor Donor
     participant Browser
     participant Food as FoodListingController
-    participant User as Auth user profile
-    participant DB as MySQL food_listings
+    participant DB as food_listings
+    participant NS as NotificationService
 
-    Donor->>Browser: Fill post food form
-    Browser->>Food: POST /food (session cookie)
-    Food->>Food: role === donor?
-    alt not donor
-        Food-->>Browser: 403 / error flash
-    else donor ok
-        Food->>Food: Validate title, category, quantity, expiry_at
-        Food->>User: Read address, lat, lng
-        alt missing coordinates
-            Food-->>Browser: 422 profile needs location
-        else ok
-            Food->>DB: INSERT listing AVAILABLE
-            Food-->>Browser: Redirect /food/mine or JSON 201
-        end
+    Donor->>Browser: Post food form
+    Browser->>Food: POST /food
+    Food->>Food: Validate + copy donor lat/lng
+    Food->>DB: INSERT status AVAILABLE moderation PENDING or APPROVED
+    opt listing approved for search
+        Food->>NS: notify nearby recipients
     end
+    Food-->>Browser: Redirect /food/mine

@@ -10,7 +10,7 @@
             <p class="small text-muted">Form posts to <strong>POST /auth/register</strong> (same as Postman).</p>
             <p class="form-hint"><span class="text-danger">*</span> Required fields</p>
 
-            <form method="POST" action="{{ url('/auth/register') }}" id="registerForm">
+            <form method="POST" action="{{ url('/auth/register') }}" id="registerForm" enctype="multipart/form-data">
                 @csrf
 
                 <p class="form-section-title">Account</p>
@@ -62,6 +62,11 @@
                         <label for="contact_person" class="form-label required">Contact person</label>
                         <input type="text" class="form-control" id="contact_person" name="contact_person" value="{{ old('contact_person') }}">
                     </div>
+                    <div class="col-12">
+                        <label for="verification_document" class="form-label required">Verification document</label>
+                        <input type="file" class="form-control" id="verification_document" name="verification_document" accept=".pdf,image/*">
+                        <div class="form-text">PDF or photo of NGO registration (admin reviews before you can claim).</div>
+                    </div>
                 </div>
 
                 <p class="form-section-title">Your location (used for pickup / search)</p>
@@ -102,6 +107,10 @@
         document.getElementById('phone').required = isDonor;
         document.getElementById('ngo_name').required = !isDonor;
         document.getElementById('contact_person').required = !isDonor;
+        var docInput = document.getElementById('verification_document');
+        if (docInput) {
+            docInput.required = !isDonor;
+        }
     }
 
     document.getElementById('registerForm').addEventListener('submit', function (e) {

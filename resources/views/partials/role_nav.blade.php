@@ -1,0 +1,16 @@
+@auth
+    @switch(auth()->user()->role)
+        @case('admin')
+            @include('partials.admin_nav')
+            @break
+        @case('donor')
+            @include('partials.donor_nav')
+            @break
+        @case('recipient')
+            @include('partials.recipient_nav')
+            @break
+        @case('volunteer')
+            @include('partials.volunteer_nav')
+            @break
+    @endswitch
+@endauth

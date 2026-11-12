@@ -14,8 +14,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        if (filter_var(env('SEED_ADMIN', false), FILTER_VALIDATE_BOOLEAN)) {
-            $this->call(AdminUserSeeder::class);
+        $seedDemo = filter_var(env('SEED_DEMO_USERS', env('SEED_ADMIN', false)), FILTER_VALIDATE_BOOLEAN);
+        if ($seedDemo) {
+            $this->call(UserSeeder::class);
         }
     }
 }

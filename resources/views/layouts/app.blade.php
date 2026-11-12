@@ -11,7 +11,7 @@
 <body class="d-flex flex-column min-vh-100">
     <nav class="navbar navbar-expand-lg navbar-dark bg-brand">
         <div class="container">
-            <a class="navbar-brand fw-semibold" href="{{ url('/') }}">Food Portal</a>
+            <a class="navbar-brand fw-semibold" href="{{ auth()->check() ? url(auth()->user()->homePath()) : url('/') }}">Food Portal</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -22,7 +22,7 @@
                 <ul class="navbar-nav align-items-lg-center gap-lg-2">
                     @auth
                         <li class="nav-item">
-                            <span class="navbar-text small text-white-50">{{ auth()->user()->name }} ({{ auth()->user()->role }})</span>
+                            <a class="nav-link small text-white-50 py-0" href="{{ url('/profile') }}">{{ auth()->user()->name }} ({{ auth()->user()->role }})</a>
                         </li>
                         <li class="nav-item">
                             <form method="POST" action="{{ url('/auth/logout') }}" class="d-inline">
@@ -30,9 +30,10 @@
                                 <button type="submit" class="btn btn-link nav-link px-0">Logout</button>
                             </form>
                         </li>
-                    @else
-                        <li class="nav-item"><a class="nav-link" href="{{ url('/login') }}">Login</a></li>
                     @endauth
+                    @guest
+                        <li class="nav-item"><a class="nav-link" href="{{ url('/login') }}">Login</a></li>
+                    @endguest
                 </ul>
             </div>
         </div>

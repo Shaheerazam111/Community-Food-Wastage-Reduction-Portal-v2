@@ -11,6 +11,16 @@
     <h1 class="page-title h4 mb-0">Find food nearby</h1>
 </div>
 
+@auth
+    @if (auth()->user()->role === 'recipient' && auth()->user()->verification_status !== 'approved')
+        <div class="alert alert-warning">
+            NGO verification is <strong>{{ auth()->user()->verification_status }}</strong>.
+            You can search food but cannot claim until an admin approves your document.
+            <a href="{{ url('/recipient/verification') }}">View verification status</a>
+        </div>
+    @endif
+@endauth
+
 <div class="card page-card mb-4">
     <div class="card-body">
         <p class="small text-muted mb-3">
@@ -21,6 +31,11 @@
             <input type="hidden" id="latitude" name="latitude" value="{{ $latitude }}">
             <input type="hidden" id="longitude" name="longitude" value="{{ $longitude }}">
 
+            <div class="col-12 col-md-4">
+                <label for="city" class="form-label">Or search by city</label>
+                <input type="text" class="form-control" id="city" name="city" value="{{ $city ?? '' }}" placeholder="e.g. Lahore">
+                <div class="form-text">City search ignores radius; leave blank to use map/GPS.</div>
+            </div>
             <div class="col-12 col-md-4">
                 <label for="radius_km" class="form-label">Radius (km)</label>
                 <input type="number" step="0.1" min="0.1" max="100" class="form-control" id="radius_km" name="radius_km" value="{{ $radius_km }}">
@@ -34,6 +49,9 @@
                         Search using profile pin
                     </button>
                 @endif
+                <button type="submit" class="btn btn-outline-secondary" id="btn-city-search">
+                    Search by city
+                </button>
             </div>
         </form>
 
@@ -65,7 +83,17 @@
 </div>
 
 @if (empty($searched))
-    <div class="alert alert-info">Tap <strong>Use my current location &amp; search</strong> to find food near you.</div>
+    <div class="alert alert-info">Tap <strong>Use my current location &amp; search</strong>, use your <strong>profile pin</strong>, or type a city and press <strong>Search by city</strong>.</div>
+@endif
+
+@if (! empty($searched) && $listings->isEmpty() && ! empty($pendingNearby))
+    <div class="alert alert-warning">
+        No approved food in this area, but <strong>{{ $pendingNearby }}</strong> listing(s) are waiting for <strong>admin approval</strong> and are hidden from search until approved.
+    </div>
+@elseif (! empty($searched) && $listings->isEmpty())
+    <div class="alert alert-secondary mb-0">
+        Nothing matched. Try a larger radius, another city, or ask the donor to post again. New posts need admin approval in production.
+    </div>
 @endif
 
 <div class="card page-card">
@@ -90,12 +118,22 @@
                             <td>{{ $listing->quantity }}</td>
                             <td class="small">{{ $listing->pickup_address }}</td>
                             <td class="small">{{ $listing->expiry_at }}</td>
-                            <td>{{ number_format((float) $listing->distance_km, 2) }}</td>
                             <td>
-                                <form method="POST" action="{{ url('/food/'.$listing->id.'/claim') }}">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-brand" data-confirm="Claim this food?">Claim</button>
-                                </form>
+                                @if (isset($listing->distance_km))
+                                    {{ number_format((float) $listing->distance_km, 2) }}
+                                @else
+                                    —
+                                @endif
+                            </td>
+                            <td>
+                                @if (auth()->user()->verification_status === 'approved')
+                                    <form method="POST" action="{{ url('/food/'.$listing->id.'/claim') }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-brand" data-confirm="Claim this food?">Claim</button>
+                                    </form>
+                                @else
+                                    <span class="small text-muted">Verify NGO first</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
@@ -187,9 +225,16 @@
     }
 
     form.addEventListener('submit', function (e) {
+        var cityInput = document.getElementById('city');
+        var city = cityInput ? cityInput.value.trim() : '';
+        if (city !== '') {
+            latInput.value = '';
+            lngInput.value = '';
+            return;
+        }
         if (latInput.value === '' || lngInput.value === '') {
             e.preventDefault();
-            alert('Set a location first (current location button or manual coordinates).');
+            alert('Set a location first (GPS, profile pin, manual coordinates, or search by city name).');
         }
     });
 })();

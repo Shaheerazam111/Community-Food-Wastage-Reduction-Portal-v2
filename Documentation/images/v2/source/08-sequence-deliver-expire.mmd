@@ -1,29 +1,18 @@
 sequenceDiagram
     autonumber
-    actor Donor
-    participant Browser
+    actor User as Donor or Volunteer
     participant Food as FoodListingController
-    participant DB as MySQL food_listings
-    participant Cron as Scheduler
-    participant Cmd as food:expire command
+    participant Vol as VolunteerController
+    participant Cmd as food:expire
+    participant DB as food_listings
 
-    rect rgb(240, 248, 255)
-        Note over Donor,DB: Mark delivered
-        Donor->>Browser: Mark delivered
-        Browser->>Food: POST /food/{id}/deliver
-        Food->>DB: SELECT listing
-        alt not owner or not CLAIMED
-            Food-->>Browser: 403 or 422
-        else ok
-            Food->>DB: UPDATE status DELIVERED, delivered_at
-            Food-->>Browser: Success redirect or JSON
-        end
+    alt Donor delivers
+        User->>Food: POST /food/id/deliver
+        Food->>DB: UPDATE DELIVERED
+    else Volunteer completes
+        User->>Vol: POST /volunteer/tasks/id/complete
+        Vol->>DB: UPDATE DELIVERED
     end
 
-    rect rgb(245, 245, 245)
-        Note over Cron,DB: Hourly expiry (Challenge 3)
-        Cron->>Cmd: Run food:expire
-        Cmd->>DB: UPDATE WHERE status AVAILABLE AND expiry_at <= now()
-        Cmd->>DB: SET status EXPIRED
-        Cmd-->>Cron: Count updated
-    end
+    Note over Cmd,DB: Hourly scheduler
+    Cmd->>DB: SET EXPIRED where AVAILABLE and past expiry

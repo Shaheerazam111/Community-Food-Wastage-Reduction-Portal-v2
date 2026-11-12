@@ -19,7 +19,7 @@ cp .env.example .env
 php artisan key:generate
 # Set DB_DATABASE=cfwrp_v2 in .env, create DB in MySQL
 php artisan migrate
-php artisan db:seed --class=AdminUserSeeder
+php artisan db:seed --class=UserSeeder
 php artisan serve
 ```
 

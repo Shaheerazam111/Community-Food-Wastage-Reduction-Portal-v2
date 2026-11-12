@@ -11,6 +11,9 @@
                 @endif
                 <th>Expires</th>
                 <th>Status</th>
+                @if (! empty($showDeliverButton))
+                    <th>Admin</th>
+                @endif
                 @if (! empty($showClaimInfo))
                     <th>Claimed by</th>
                 @endif
@@ -43,6 +46,9 @@
                     @endif
                     <td>{{ $expiryText }}</td>
                     <td><span class="badge badge-status {{ $badge }}">{{ $status }}</span></td>
+                    @if (! empty($showDeliverButton))
+                        <td class="small">{{ $listing->moderation_status ?? '—' }}</td>
+                    @endif
                     @if (! empty($showClaimInfo))
                         <td class="small">
                             @if ($claimer)

@@ -97,7 +97,7 @@
                 <ul class="mb-0">
                     <li>Filter by date range on the <a href="{{ route('admin.reports') }}">Reports</a> page (max {{ \App\Services\AdminReportService::MAX_RANGE_DAYS }} days).</li>
                     <li>See trends, top donors/NGOs, pickup areas, and export CSV for your assignment write-up.</li>
-                    <li>Admin accounts are not created from the public register form. Run <code>php artisan db:seed --class=AdminUserSeeder</code> once after migrate.</li>
+                    <li>Demo accounts (admin, donor, NGO, volunteer) come from <code>php artisan db:seed --class=UserSeeder</code> — not the public register form.</li>
                 </ul>
             </div>
         </div>

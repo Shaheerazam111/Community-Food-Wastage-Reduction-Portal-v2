@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Concerns\HandlesPortalResponses;
 use App\Models\User;
+use App\Models\VerificationDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -27,19 +28,38 @@ class AuthController extends Controller
             'address' => 'required|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
+            'verification_document' => 'required_if:role,recipient|nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         $data['password'] = Hash::make($data['password']);
+        $data['verification_status'] = $data['role'] === 'recipient' ? 'pending' : 'approved';
+        unset($data['verification_document']);
+
         $user = User::create($data);
 
+        if ($request->hasFile('verification_document')) {
+            $file = $request->file('verification_document');
+            $path = $file->store('ngo-documents', 'local');
+            VerificationDocument::create([
+                'user_id' => $user->id,
+                'file_path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'status' => 'pending',
+            ]);
+        }
+
         Auth::login($user);
+
+        $flash = $user->role === 'recipient'
+            ? 'Account created. Your NGO document is pending admin review.'
+            : 'Account created. You are now logged in.';
 
         return $this->portalRedirect(
             $request,
             ['user' => $user],
             201,
-            $this->homeForRole($user->role),
-            'Account created. You are now logged in.'
+            User::homePathForRole($user->role),
+            $flash
         );
     }
 
@@ -62,11 +82,23 @@ class AuthController extends Controller
         $request->session()->regenerate();
         $user = Auth::user();
 
+        if ($user->is_active === false) {
+            Auth::logout();
+            $request->session()->invalidate();
+
+            return $this->portalBack(
+                $request,
+                ['message' => 'Account blocked'],
+                403,
+                'Your account is blocked. Contact the admin.'
+            );
+        }
+
         return $this->portalRedirect(
             $request,
             ['user' => $user],
             200,
-            $this->homeForRole($user->role),
+            User::homePathForRole($user->role),
             'Welcome back, '.$user->name.'.'
         );
     }
@@ -86,16 +118,4 @@ class AuthController extends Controller
         );
     }
 
-    private function homeForRole(string $role): string
-    {
-        if ($role === 'admin') {
-            return '/admin/dashboard';
-        }
-
-        if ($role === 'donor') {
-            return '/donor/dashboard';
-        }
-
-        return '/recipient/food';
-    }
 }

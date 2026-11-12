@@ -3,9 +3,7 @@
 @section('title', 'Post Food')
 
 @section('nav')
-<li class="nav-item"><a class="nav-link" href="{{ url('/donor/dashboard') }}">Dashboard</a></li>
-<li class="nav-item"><a class="nav-link active" href="{{ url('/donor/donations/create') }}">Post food</a></li>
-<li class="nav-item"><a class="nav-link" href="{{ url('/food/mine') }}">My listings</a></li>
+@include('partials.donor_nav')
 @endsection
 
 @section('content')
@@ -26,7 +24,7 @@
             Longitude: {{ auth()->user()->longitude ?? '—' }}
         </div>
         @endauth
-        <form method="POST" action="{{ url('/food') }}">
+        <form method="POST" action="{{ url('/food') }}" enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label for="title" class="form-label required">Food title</label>
@@ -48,6 +46,11 @@
             <div class="mb-3">
                 <label for="quantity" class="form-label required">Quantity</label>
                 <input type="text" class="form-control" id="quantity" name="quantity" value="{{ old('quantity') }}" required placeholder="e.g. 20 boxes">
+            </div>
+            <div class="mb-3">
+                <label for="photo" class="form-label">Photo (optional)</label>
+                <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                <div class="form-text">Stored locally under storage/app/public (run php artisan storage:link).</div>
             </div>
             <div class="mb-3">
                 <label for="expiry_at" class="form-label required">Expiry date &amp; time</label>

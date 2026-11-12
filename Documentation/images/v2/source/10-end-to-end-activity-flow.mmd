@@ -1,28 +1,13 @@
-flowchart TD
-    Start([Start]) --> RegD[Donor registers with lat/lng]
-    RegD --> RegN[NGO registers with lat/lng]
-    RegN --> Post[Donor POST /food]
-    Post --> Avail[(Listing AVAILABLE)]
-
-    Avail --> Search[NGO GET /food/search]
-    Search --> Found{Listing in radius\nand not expired?}
-    Found -->|No| Search
-    Found -->|Yes| Claim[NGO POST /food/id/claim]
-    Claim --> ClaimOk{Update 1 row?}
-    ClaimOk -->|No 409| Search
-    ClaimOk -->|Yes| Claimed[(Listing CLAIMED)]
-
-    Claimed --> Pickup[Physical pickup]
-    Pickup --> Deliver[Donor POST /food/id/deliver]
-    Deliver --> Done[(Listing DELIVERED)]
-
-    Done --> Admin[Admin views /admin/reports]
-    Admin --> End([End])
-
-    Avail -.->|time passes| ExpireJob[food:expire job]
-    ExpireJob --> Expired[(Listing EXPIRED)]
-
-    style Avail fill:#e8f3ed
-    style Claimed fill:#e7f1ff
-    style Done fill:#e2e3e5
-    style Expired fill:#f8d7da
+flowchart TB
+    A[Donor registers] --> B[Donor posts listing]
+    B --> C{Moderation}
+    C -->|PENDING| D[Admin approves]
+    C -->|APPROVED| E[AVAILABLE]
+    D --> E
+    F[NGO verified] --> G[Search food]
+    E --> G
+    G --> H[Claim atomic]
+    H --> I[CLAIMED]
+    I --> J[Donor or volunteer DELIVERED]
+    J --> K[Feedback optional]
+    E -.-> L[Expire job EXPIRED]
